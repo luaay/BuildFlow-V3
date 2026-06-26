@@ -17,6 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{FB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.Identity.Domain", "src\Modules\Identity\BuildFlow.Identity.Domain\BuildFlow.Identity.Domain.csproj", "{37F13378-C5FE-4266-8B00-20ED6D4CB0F7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{C02BD035-9F5A-40A2-AE1C-87F081C69442}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.Identity.Domain.UnitTests", "tests\BuildFlow.Identity.Domain.UnitTests\BuildFlow.Identity.Domain.UnitTests.csproj", "{AA596952-2E02-48FD-8FB9-6C2BA7D0DE28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +42,10 @@ Global
 		{37F13378-C5FE-4266-8B00-20ED6D4CB0F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37F13378-C5FE-4266-8B00-20ED6D4CB0F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37F13378-C5FE-4266-8B00-20ED6D4CB0F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA596952-2E02-48FD-8FB9-6C2BA7D0DE28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA596952-2E02-48FD-8FB9-6C2BA7D0DE28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA596952-2E02-48FD-8FB9-6C2BA7D0DE28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA596952-2E02-48FD-8FB9-6C2BA7D0DE28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{01EA3993-C7D7-4E90-9A0B-287E457203E9} = {FC83BCC1-C4AD-4DBF-9CCB-D43DC0505323}
@@ -46,5 +54,6 @@ Global
 		{0382F1C8-9CD4-44CF-A219-6A735712B488} = {FC83BCC1-C4AD-4DBF-9CCB-D43DC0505323}
 		{FB479755-82FF-49C2-A64F-BDFBDFFFF23C} = {0382F1C8-9CD4-44CF-A219-6A735712B488}
 		{37F13378-C5FE-4266-8B00-20ED6D4CB0F7} = {FB479755-82FF-49C2-A64F-BDFBDFFFF23C}
+		{AA596952-2E02-48FD-8FB9-6C2BA7D0DE28} = {C02BD035-9F5A-40A2-AE1C-87F081C69442}
 	EndGlobalSection
 EndGlobal
