@@ -53,6 +53,9 @@ src/
             ├── Tenants/                 # Tenant aggregate, TenantId, repository, enums, events
             ├── Users/                   # User aggregate, UserId, Email VO, repository, enums, events
             └── Errors/                  # IdentityErrors (coded, security-aware)
+
+tests/
+└── BuildFlow.Identity.Domain.UnitTests/ # Unit tests for the Identity domain
 ```
 
 ---
@@ -70,6 +73,21 @@ src/
 
 ---
 
+## Testing
+
+The domain layer is covered by fast, dependency-free unit tests (xUnit + FluentAssertions). Because the domain has no external dependencies, tests run without a database or mocks, and they double as living documentation of the business rules.
+
+Covered so far:
+- **Email** value object — validation, normalization, structural equality.
+- **Tenant** aggregate — factory, domain events, suspend/activate, idempotency.
+- **User** aggregate — factory, role changes, and the full account-lockout lifecycle.
+
+```bash
+dotnet test
+```
+
+---
+
 ## Build
 
 ```bash
@@ -83,7 +101,7 @@ Requires .NET SDK **8.0.x** (pinned in `global.json`). SQL Server is needed for 
 ## Roadmap
 
 - [x] **Phase 1** — Solution structure, SharedKernel, Application abstractions
-- [x] **Phase 2** — Identity domain (Tenant & User aggregates, value objects, events, repositories, errors)
+- [x] **Phase 2** — Identity domain (Tenant & User aggregates, value objects, events, repositories, errors) + domain unit tests
 - [ ] **Phase 3** — Identity application (CQRS handlers, validation)
 - [ ] **Phase 4** — Identity infrastructure (EF Core, value converters, repository implementations)
 - [ ] **Phase 5** — API layer
