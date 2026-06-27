@@ -13,6 +13,9 @@ public static class IdentityErrors
 
         public static AppError NotFound =>
             new("Tenant.NotFound", "Tenant was not found.");
+
+        public static AppError Suspended =>
+            new("Tenant.Suspended", "This tenant account is suspended.");
     }
 
     public static class User
@@ -33,5 +36,8 @@ public static class IdentityErrors
 
         public static AppError AccountInactive =>
             new("User.AccountInactive", "Account is inactive.");
+
+        public static AppError CannotInviteOwner =>
+            new("User.CannotInviteOwner", "The Owner role cannot be assigned via invitation.");
     }
 }

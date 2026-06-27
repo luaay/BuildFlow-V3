@@ -18,4 +18,10 @@ public interface IUserRepository
         TenantId tenantId,
         Email email,
         CancellationToken cancellationToken = default);
+
+    Task<(IReadOnlyList<User> Users, int TotalCount)> GetPagedByTenantAsync(
+        TenantId tenantId,
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default);
 }
