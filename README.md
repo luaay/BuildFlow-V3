@@ -20,7 +20,7 @@ Built as a portfolio project to demonstrate professional .NET architecture: Modu
 - **Modular Monolith** — strict module boundaries inside a single deployable.
 - **Domain-Driven Design** — rich aggregates, value objects, and domain events.
 - **Clean Architecture** — dependencies point inward; boundaries enforced at the project-reference level.
-- **CQRS** — commands (writes) and queries (reads) separated into distinct models.
+- **CQRS** — commands (writes) and queries (reads) separated, organized as vertical slices.
 - **Multi-Tenancy** — tenant isolation driven by claims from the JWT.
 
 ### Modules
@@ -35,24 +35,22 @@ Built as a portfolio project to demonstrate professional .NET architecture: Modu
 
 ```text
 src/
-├── SharedKernel/                        # Domain primitives shared across modules
-│   └── Domain/
-│       ├── Entity.cs                    # Generic, identity-based equality
-│       ├── AggregateRoot.cs             # Consistency boundary + domain events
-│       ├── ValueObject.cs               # Structural equality
-│       ├── IDomainEvent.cs / DomainEvent.cs
-│       ├── AppError.cs                  # Structured error with code
-│       └── Auditing/ (IAuditableEntity, ISoftDelete)
+├── SharedKernel/                        # Domain primitives (Entity, AggregateRoot, ValueObject, DomainEvent, AppError, auditing)
 │
 ├── BuildingBlocks/
 │   └── Application.Abstractions/        # CQRS contracts (ICommand, IQuery, handlers, PagedResult)
 │
 └── Modules/
     └── Identity/
-        └── BuildFlow.Identity.Domain/
-            ├── Tenants/                 # Tenant aggregate, TenantId, repository, enums, events
-            ├── Users/                   # User aggregate, UserId, Email VO, repository, enums, events
-            └── Errors/                  # IdentityErrors (coded, security-aware)
+        ├── BuildFlow.Identity.Domain/        # Tenant & User aggregates, value objects, events, repositories, errors
+        └── BuildFlow.Identity.Application/    # Use cases as vertical slices
+            ├── Abstractions/                  # ICurrentUserService, IPasswordHasher, IJwtProvider, IUnitOfWork
+            ├── EventHandlers/                 # Reactions to domain events
+            ├── Features/
+            │   ├── Auth/Login/                # Login with account lockout
+            │   ├── Tenants/RegisterTenant/    # Register tenant + owner (atomic)
+            │   └── Users/ (InviteUser, GetUsers)
+            └── DependencyInjection.cs
 
 tests/
 └── BuildFlow.Identity.Domain.UnitTests/ # Unit tests for the Identity domain
@@ -62,14 +60,16 @@ tests/
 
 ## Key Design Decisions
 
-- **Strongly-typed IDs** (`TenantId`, `UserId`) over raw `Guid` to eliminate primitive obsession.
+- **Strongly-typed IDs** over raw `Guid` to eliminate primitive obsession.
 - **Value objects** (`Email`) so validation happens once and illegal states are unrepresentable.
-- **Rich domain model** — entities own their behavior and invariants (e.g. account lockout logic).
+- **Rich domain model** — entities own their behavior and invariants (account lockout, suspension).
 - **Aggregates reference each other by ID**, never by object reference.
+- **CQRS with vertical slices** — each use case bundles its command, validator, and handler.
 - **Result pattern** (FluentResults) for expected failures; exceptions for the truly exceptional.
-- **Temporary account lockout** after repeated failed logins, like ASP.NET Core Identity.
-- **Security-aware errors** — generic "invalid email or password" to prevent user enumeration.
-- **UTC everywhere**; **reproducible builds** via `global.json`.
+- **Unit of Work** wraps EF Core's DbContext behind an abstraction for atomic transactions.
+- **Tenant isolation** — handlers derive the tenant from `ICurrentUserService`, never the request.
+- **Security-aware** — generic "invalid credentials" to prevent enumeration, temporary lockout, password hashing behind an abstraction.
+- **DTOs** so the domain (e.g. password hash) never leaks through the API.
 
 ---
 
@@ -101,9 +101,9 @@ Requires .NET SDK **8.0.x** (pinned in `global.json`). SQL Server is needed for 
 ## Roadmap
 
 - [x] **Phase 1** — Solution structure, SharedKernel, Application abstractions
-- [x] **Phase 2** — Identity domain (Tenant & User aggregates, value objects, events, repositories, errors) + domain unit tests
-- [ ] **Phase 3** — Identity application (CQRS handlers, validation)
-- [ ] **Phase 4** — Identity infrastructure (EF Core, value converters, repository implementations)
+- [x] **Phase 2** — Identity domain (aggregates, value objects, events, repositories, errors) + domain unit tests
+- [x] **Phase 3** — Identity application (CQRS vertical slices: RegisterTenant, Login, InviteUser, GetUsers; event handlers; DI)
+- [ ] **Phase 4** — Identity infrastructure (EF Core, value converters, repository & Unit of Work implementations, hashing, JWT)
 - [ ] **Phase 5** — API layer
 - [ ] **Phase 6** — Projects module
 - [ ] **Phase 7** — Documents module (review workflow)
