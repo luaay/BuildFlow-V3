@@ -2,7 +2,7 @@
 
 // AggregateRoot هو "حارس البوابة" — نقطة الدخول الوحيدة للـ aggregate
 // يرث كل خصائص Entity (الهوية والمساواة) ويضيف إدارة الأحداث
-public abstract class AggregateRoot<TId> : Entity<TId>
+public abstract class AggregateRoot<TId> : Entity<TId>, IHasDomainEvents
     where TId : notnull
 {
     // قائمة خاصة — لا أحد خارج الـ aggregate يضيف أحداثاً مباشرة
