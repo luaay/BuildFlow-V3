@@ -8,7 +8,7 @@ Built as a portfolio project to demonstrate professional .NET architecture: Modu
 
 ## Tech Stack
 
-**Backend:** ASP.NET Core 8 · Entity Framework Core 8 · SQL Server · MediatR (CQRS) · FluentValidation · FluentResults · Serilog · JWT
+**Backend:** ASP.NET Core 8 · Entity Framework Core 8 · SQL Server · MediatR (CQRS) · FluentValidation · FluentResults · Serilog · JWT · BCrypt
 **Frontend:** React 18 · TypeScript · Vite · Tailwind CSS · Zustand · TanStack Query · React Hook Form · Axios
 **Testing:** xUnit · FluentAssertions · NSubstitute
 **DevOps:** Docker · Docker Compose · GitHub Actions
@@ -20,8 +20,8 @@ Built as a portfolio project to demonstrate professional .NET architecture: Modu
 - **Modular Monolith** — strict module boundaries inside a single deployable.
 - **Domain-Driven Design** — rich aggregates, value objects, and domain events.
 - **Clean Architecture** — dependencies point inward; boundaries enforced at the project-reference level.
-- **CQRS** — commands (writes) and queries (reads) separated, organized as vertical slices.
-- **Multi-Tenancy** — tenant isolation driven by claims from the JWT.
+- **CQRS** — commands and queries separated, organized as vertical slices.
+- **Multi-Tenancy** — tenant isolation driven by claims from the JWT, enforced down to the database with composite unique indexes.
 
 ### Modules
 
@@ -42,15 +42,9 @@ src/
 │
 └── Modules/
     └── Identity/
-        ├── BuildFlow.Identity.Domain/        # Tenant & User aggregates, value objects, events, repositories, errors
-        └── BuildFlow.Identity.Application/    # Use cases as vertical slices
-            ├── Abstractions/                  # ICurrentUserService, IPasswordHasher, IJwtProvider, IUnitOfWork
-            ├── EventHandlers/                 # Reactions to domain events
-            ├── Features/
-            │   ├── Auth/Login/                # Login with account lockout
-            │   ├── Tenants/RegisterTenant/    # Register tenant + owner (atomic)
-            │   └── Users/ (InviteUser, GetUsers)
-            └── DependencyInjection.cs
+        ├── BuildFlow.Identity.Domain/        # Aggregates, value objects, events, repositories, errors
+        ├── BuildFlow.Identity.Application/    # Use cases as vertical slices, abstractions, event handlers
+        └── BuildFlow.Identity.Infrastructure/ # EF Core, value converters, repositories, Unit of Work, BCrypt, JWT, migrations
 
 tests/
 └── BuildFlow.Identity.Domain.UnitTests/ # Unit tests for the Identity domain
@@ -60,16 +54,17 @@ tests/
 
 ## Key Design Decisions
 
-- **Strongly-typed IDs** over raw `Guid` to eliminate primitive obsession.
+- **Strongly-typed IDs** over raw `Guid`, persisted via EF Core value converters.
 - **Value objects** (`Email`) so validation happens once and illegal states are unrepresentable.
 - **Rich domain model** — entities own their behavior and invariants (account lockout, suspension).
 - **Aggregates reference each other by ID**, never by object reference.
 - **CQRS with vertical slices** — each use case bundles its command, validator, and handler.
 - **Result pattern** (FluentResults) for expected failures; exceptions for the truly exceptional.
-- **Unit of Work** wraps EF Core's DbContext behind an abstraction for atomic transactions.
+- **Unit of Work** wraps EF Core's DbContext and dispatches domain events only after a successful save.
+- **Soft delete** via a global query filter; **per-tenant email uniqueness** via a composite unique index.
 - **Tenant isolation** — handlers derive the tenant from `ICurrentUserService`, never the request.
-- **Security-aware** — generic "invalid credentials" to prevent enumeration, temporary lockout, password hashing behind an abstraction.
-- **DTOs** so the domain (e.g. password hash) never leaks through the API.
+- **Security** — BCrypt password hashing (work factor 12), signed JWTs carrying the tenant, generic "invalid credentials" to prevent enumeration, temporary account lockout.
+- **Reproducible builds** — SDK pinned via `global.json`, EF tools pinned as a local tool.
 
 ---
 
@@ -88,13 +83,20 @@ dotnet test
 
 ---
 
-## Build
+## Build & Database
 
 ```bash
 dotnet build
 ```
 
-Requires .NET SDK **8.0.x** (pinned in `global.json`). SQL Server is needed for later phases.
+Requires .NET SDK **8.0.x** (pinned in `global.json`) and SQL Server.
+
+Apply the database schema with the pinned local EF tool:
+
+```bash
+dotnet tool restore
+dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infrastructure --startup-project src/Modules/Identity/BuildFlow.Identity.Infrastructure
+```
 
 ---
 
@@ -102,9 +104,9 @@ Requires .NET SDK **8.0.x** (pinned in `global.json`). SQL Server is needed for 
 
 - [x] **Phase 1** — Solution structure, SharedKernel, Application abstractions
 - [x] **Phase 2** — Identity domain (aggregates, value objects, events, repositories, errors) + domain unit tests
-- [x] **Phase 3** — Identity application (CQRS vertical slices: RegisterTenant, Login, InviteUser, GetUsers; event handlers; DI)
-- [ ] **Phase 4** — Identity infrastructure (EF Core, value converters, repository & Unit of Work implementations, hashing, JWT)
-- [ ] **Phase 5** — API layer
+- [x] **Phase 3** — Identity application (CQRS vertical slices, event handlers, DI)
+- [x] **Phase 4** — Identity infrastructure (EF Core, value converters, repositories, Unit of Work, BCrypt, JWT, initial migration)
+- [ ] **Phase 5** — API layer (controllers, JWT auth, current-user service)
 - [ ] **Phase 6** — Projects module
 - [ ] **Phase 7** — Documents module (review workflow)
 - [ ] **Phase 8** — MediatR pipeline (validation + logging)
