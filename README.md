@@ -40,11 +40,13 @@ src/
 ├── BuildingBlocks/
 │   └── Application.Abstractions/        # CQRS contracts (ICommand, IQuery, handlers, PagedResult)
 │
-└── Modules/
-    └── Identity/
-        ├── BuildFlow.Identity.Domain/        # Aggregates, value objects, events, repositories, errors
-        ├── BuildFlow.Identity.Application/    # Use cases as vertical slices, abstractions, event handlers
-        └── BuildFlow.Identity.Infrastructure/ # EF Core, value converters, repositories, Unit of Work, BCrypt, JWT, migrations
+├── Modules/
+│   └── Identity/
+│       ├── BuildFlow.Identity.Domain/        # Aggregates, value objects, events, repositories, errors
+│       ├── BuildFlow.Identity.Application/    # Use cases as vertical slices, abstractions, event handlers
+│       └── BuildFlow.Identity.Infrastructure/ # EF Core, value converters, repositories, Unit of Work, BCrypt, JWT, migrations
+│
+└── BuildFlow.Api/                       # API host — composition root, Minimal API endpoints, auth, error translation, Swagger
 
 tests/
 └── BuildFlow.Identity.Domain.UnitTests/ # Unit tests for the Identity domain
@@ -68,6 +70,57 @@ tests/
 
 ---
 
+## API Layer (Identity Module)
+
+The API host (`BuildFlow.Api`) is the composition root: the only project that wires all layers together. It exposes the Identity module over HTTP using **Minimal APIs**, one endpoint class per vertical slice (REPR pattern).
+
+### Endpoints
+
+| Method | Route                   | Auth      | Purpose                                    |
+|--------|-------------------------|-----------|--------------------------------------------|
+| POST   | `/api/tenants/register` | Anonymous | Create a tenant and its owner user         |
+| POST   | `/api/auth/login`       | Anonymous | Authenticate and issue a JWT               |
+| GET    | `/api/users`            | Bearer    | List users in the caller's tenant (paged)  |
+| POST   | `/api/users/invite`     | Bearer    | Invite a new user into the caller's tenant |
+
+### Authentication
+
+- JWT bearer authentication; validation parameters bound to a single `Jwt` options source shared with the token provider.
+- Inbound claim mapping disabled (`MapInboundClaims = false`) so claim names are preserved as issued; `NameClaimType` and `RoleClaimType` set explicitly.
+- `ClockSkew` set to zero for exact expiry.
+- `ICurrentUserService` reads the `sub` and `tenant` claims from `HttpContext` and exposes strongly-typed `UserId` and `TenantId`.
+
+### Multi-tenancy enforcement
+
+Protected endpoints never accept a tenant parameter. The tenant is read from the authenticated token, making cross-tenant access structurally impossible rather than relying on convention.
+
+### Error handling
+
+Failed `Result`s are translated centrally to **RFC 7807 ProblemDetails**, mapping by `AppError` code with suffix matching (for example `*.NotFound` maps to 404 and `*.AlreadyExists` maps to 409). The stable error code is attached as a ProblemDetails extension so callers branch on the code, not the message.
+
+### Configuration & secrets
+
+- Secrets (connection string, JWT signing key) are stored in **user-secrets** in development; non-secret values such as token expiry live in `appsettings.json`.
+- The connection string key is module-scoped: `ConnectionStrings:IdentityDb`.
+
+### Logging
+
+Structured logging via **Serilog**: a bootstrap logger for startup, sinks and levels read from `appsettings.json`, Console plus a daily rolling File, and request logging.
+
+### API documentation
+
+Swagger UI is available in Development at `/swagger`, with a Bearer security definition so protected endpoints can be tested directly from the browser.
+
+### Run locally
+
+```powershell
+dotnet run --project src\BuildFlow.Api\BuildFlow.Api.csproj --launch-profile https
+```
+
+Then open `https://localhost:7124/swagger`.
+
+---
+
 ## Testing
 
 The domain layer is covered by fast, dependency-free unit tests (xUnit + FluentAssertions). Because the domain has no external dependencies, tests run without a database or mocks, and they double as living documentation of the business rules.
@@ -76,6 +129,8 @@ Covered so far:
 - **Email** value object — validation, normalization, structural equality.
 - **Tenant** aggregate — factory, domain events, suspend/activate, idempotency.
 - **User** aggregate — factory, role changes, and the full account-lockout lifecycle.
+
+Broader unit and integration testing (repositories and full-path tests via Testcontainers and WebApplicationFactory) are consolidated in Phase 10, once all modules exist.
 
 ```bash
 dotnet test
@@ -95,7 +150,7 @@ Apply the database schema with the pinned local EF tool:
 
 ```bash
 dotnet tool restore
-dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infrastructure --startup-project src/Modules/Identity/BuildFlow.Identity.Infrastructure
+dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infrastructure --startup-project src/BuildFlow.Api
 ```
 
 ---
@@ -106,11 +161,15 @@ dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infr
 - [x] **Phase 2** — Identity domain (aggregates, value objects, events, repositories, errors) + domain unit tests
 - [x] **Phase 3** — Identity application (CQRS vertical slices, event handlers, DI)
 - [x] **Phase 4** — Identity infrastructure (EF Core, value converters, repositories, Unit of Work, BCrypt, JWT, initial migration)
-- [ ] **Phase 5** — API layer (controllers, JWT auth, current-user service)
+- [x] **Phase 5** — API layer (Minimal APIs, JWT auth, current-user service, central error translation, Serilog, Swagger)
 - [ ] **Phase 6** — Projects module
 - [ ] **Phase 7** — Documents module (review workflow)
 - [ ] **Phase 8** — MediatR pipeline (validation + logging)
 - [ ] **Phase 9** — Docker, CI/CD, documentation
+- [ ] **Phase 10** — Integration testing (Testcontainers + WebApplicationFactory) across all modules
+- [ ] **Phase 11** — OpenTelemetry (distributed tracing)
+- [ ] **Phase 12** — Redis caching (optional)
+- [ ] **Phase 13** — Azure deployment (optional)
 
 ---
 
