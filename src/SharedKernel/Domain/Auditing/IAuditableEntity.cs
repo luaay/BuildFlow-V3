@@ -3,8 +3,9 @@
 // عقد التدقيق — أي entity تطبّقه تُملأ حقوله تلقائياً في الـ Infrastructure
 public interface IAuditableEntity
 {
-    DateTime CreatedAtUtc { get; set; }
-    Guid CreatedBy { get; set; }
-    DateTime? ModifiedAtUtc { get; set; }
-    Guid? ModifiedBy { get; set; }
+// IAuditableEntity — filled by the auditing interceptor in Infrastructure.
+    public DateTime CreatedAtUtc { get; set; }
+    public Guid CreatedBy { get; set; }
+    public DateTime? ModifiedAtUtc { get; set; }
+    public Guid? ModifiedBy { get; set; }
 }

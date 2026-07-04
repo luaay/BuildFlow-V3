@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\SharedKernel\BuildFlow.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Application.Abstractions\BuildFlow.Application.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
