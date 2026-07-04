@@ -4,6 +4,8 @@
 
 Built as a portfolio project to demonstrate professional .NET architecture: Modular Monolith, Domain-Driven Design, Clean Architecture, and CQRS.
 
+> 🎥 **Video series:** This codebase is taught step by step on YouTube — [BuildVision Eng: Luay](https://www.youtube.com/@BuildVisionEngLuay), playlist [Enterprise API Development](https://www.youtube.com/watch?v=BtDY8nP7s-s&list=PLvQd5bL8gZSsOxYZfdleDcERevGIcvYbm) (currently in Arabic; an English series is planned).
+
 ---
 
 ## Tech Stack
@@ -162,7 +164,7 @@ dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infr
 - [x] **Phase 3** — Identity application (CQRS vertical slices, event handlers, DI)
 - [x] **Phase 4** — Identity infrastructure (EF Core, value converters, repositories, Unit of Work, BCrypt, JWT, initial migration)
 - [x] **Phase 5** — API layer (Minimal APIs, JWT auth, current-user service, central error translation, Serilog, Swagger)
-- [ ] **Phase 6** — Projects module
+- [ ] **Phase 6** — Projects module (domain model + unit tests done; application, infrastructure, and API in progress)
 - [ ] **Phase 7** — Documents module (review workflow)
 - [ ] **Phase 8** — MediatR pipeline (validation + logging)
 - [ ] **Phase 9** — Docker, CI/CD, documentation
@@ -170,6 +172,17 @@ dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infr
 - [ ] **Phase 11** — OpenTelemetry (distributed tracing)
 - [ ] **Phase 12** — Redis caching (optional)
 - [ ] **Phase 13** — Azure deployment (optional)
+
+---
+
+## Video Series
+
+This project is built and explained step by step on YouTube, focusing on architectural decision-making rather than syntax alone.
+
+- **Channel:** [BuildVision Eng: Luay](https://www.youtube.com/@BuildVisionEngLuay)
+- **Playlist:** [Enterprise API Development](https://www.youtube.com/watch?v=BtDY8nP7s-s&list=PLvQd5bL8gZSsOxYZfdleDcERevGIcvYbm)
+
+The current series is in Arabic; an English series is planned.
 
 ---
 
