@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.Projects.Domain.U
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.Projects.Application", "src\Modules\Projects\BuildFlow.Projects.Application\BuildFlow.Projects.Application.csproj", "{A0ADBC6B-107C-428D-81F4-B05EF83A0777}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.Projects.Infrastructure", "src\Modules\Projects\BuildFlow.Projects.Infrastructure\BuildFlow.Projects.Infrastructure.csproj", "{E7F3B507-8828-4DCA-86D9-11DC16B47965}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{A0ADBC6B-107C-428D-81F4-B05EF83A0777}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0ADBC6B-107C-428D-81F4-B05EF83A0777}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0ADBC6B-107C-428D-81F4-B05EF83A0777}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7F3B507-8828-4DCA-86D9-11DC16B47965}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7F3B507-8828-4DCA-86D9-11DC16B47965}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7F3B507-8828-4DCA-86D9-11DC16B47965}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7F3B507-8828-4DCA-86D9-11DC16B47965}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,5 +106,6 @@ Global
 		{D734017E-5A93-433A-821E-F3A11B601D74} = {AFDB3D8B-71C8-4495-8229-0F632D37B1E2}
 		{E78B6D3B-B08A-4929-8958-49E41210544F} = {C02BD035-9F5A-40A2-AE1C-87F081C69442}
 		{A0ADBC6B-107C-428D-81F4-B05EF83A0777} = {AFDB3D8B-71C8-4495-8229-0F632D37B1E2}
+		{E7F3B507-8828-4DCA-86D9-11DC16B47965} = {AFDB3D8B-71C8-4495-8229-0F632D37B1E2}
 	EndGlobalSection
 EndGlobal
