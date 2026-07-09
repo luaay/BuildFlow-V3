@@ -1,4 +1,5 @@
 using BuildFlow.Api.Endpoints.Auth;
+using BuildFlow.Api.Endpoints.Projects;
 using BuildFlow.Api.Endpoints.Tenants;
 using BuildFlow.Api.Endpoints.Users;
 
@@ -10,12 +11,14 @@ internal static class EndpointExtensions
 {
     public static void MapBuildFlowEndpoints(this IEndpointRouteBuilder app)
     {
+        // Identity module
         app.MapRegisterTenantEndpoint();
         app.MapLoginEndpoint();
         app.MapGetUsersEndpoint();
         app.MapInviteUserEndpoint();
-        // Future slices register their endpoints here.
 
-       
+        // Projects module
+        app.MapCreateProjectEndpoint();
+        app.MapGetProjectsEndpoint();
     }
 }

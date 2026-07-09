@@ -3,6 +3,8 @@ using BuildFlow.Projects.Domain.Entities;
 using BuildFlow.Projects.Domain.Enums;
 using BuildFlow.Projects.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
+using BuildFlow.Projects.Domain.ValueObjects;
+
 
 namespace BuildFlow.Projects.Infrastructure.Persistence.Repositories;
 
@@ -26,19 +28,19 @@ internal sealed class ProjectRepository(ProjectsDbContext context) : IProjectRep
     public async Task<Project?> GetByCodeAsync(
         string code, Guid tenantId, CancellationToken ct = default)
     {
-        var upper = code.Trim().ToUpperInvariant();
+        var projectCode = ProjectCode.Create(code);
         return await context.Projects
             .Include(p => p.Members)
             .FirstOrDefaultAsync(
-                p => p.TenantId == tenantId && p.Code.Value == upper, ct);
+                p => p.TenantId == tenantId && p.Code == projectCode, ct);
     }
 
     public async Task<bool> CodeExistsAsync(
         string code, Guid tenantId, CancellationToken ct = default)
     {
-        var upper = code.Trim().ToUpperInvariant();
+        var projectCode = ProjectCode.Create(code);
         return await context.Projects
-            .AnyAsync(p => p.TenantId == tenantId && p.Code.Value == upper, ct);
+            .AnyAsync(p => p.TenantId == tenantId && p.Code == projectCode, ct);
     }
 
     public async Task<PagedResult<Project>> GetPagedAsync(
@@ -62,8 +64,7 @@ internal sealed class ProjectRepository(ProjectsDbContext context) : IProjectRep
         if (!string.IsNullOrWhiteSpace(search))
         {
             var term = search.Trim();
-            query = query.Where(p =>
-                p.Name.Contains(term) || p.Code.Value.Contains(term));
+            query = query.Where(p => p.Name.Contains(term));
         }
 
         // Total before paging, to build PagedResult.
