@@ -322,4 +322,63 @@ public class ProjectTests
         project.IsLead(creatorId).Should().BeTrue();
     }
 
+
+
+    [Fact]
+    public void Cancel_FromPlanning_ShouldSucceed()
+    {
+        // Arrange
+        var project = CreateTestProject();
+
+        // Act — الإلغاء مشروع من التخطيط
+        var result = project.Cancel();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Status.Should().Be(ProjectStatus.Cancelled);
+    }
+
+    [Fact]
+    public void Cancel_FromActive_ShouldSucceed()
+    {
+        // Arrange
+        var project = CreateTestProject();
+        project.Activate();
+
+        // Act — الإلغاء مشروع من النشاط
+        var result = project.Cancel();
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        project.Status.Should().Be(ProjectStatus.Cancelled);
+    }
+
+    [Fact]
+    public void Activate_AlreadyActive_ShouldFail()
+    {
+        // Arrange
+        var project = CreateTestProject();
+        project.Activate();
+
+        // Act — تفعيل مشروع نشط أصلاً
+        var result = project.Activate();
+
+        // Assert
+        result.IsFailed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void StatusChange_ShouldRaiseStatusChangedEvent()
+    {
+        // Arrange
+        var project = CreateTestProject();
+        project.ClearDomainEvents(); // ننظّف حدث الإنشاء
+
+        // Act
+        project.Activate();
+
+        // Assert
+        project.DomainEvents.Should().Contain(e => e is ProjectStatusChangedEvent);
+    }
+
 }
