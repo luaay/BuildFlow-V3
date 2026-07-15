@@ -173,6 +173,11 @@ dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infr
 - [ ] **Phase 12** — Redis caching (optional)
 - [ ] **Phase 13** — Azure deployment (optional)
 
+### Cross-cutting improvements (layered on top of the phases above)
+
+- [x] **Structured logging** — request-context enrichment middleware pushing UserId and TenantId into the Serilog LogContext; machine/thread enrichers; console and rolling-file sinks with property output.
+- [x] **Expanded unit tests** — Identity domain (25 tests) and Projects domain (44 tests: factory, full lifecycle, member rules incl. last-lead on both paths, and direct Money/ProjectCode value-object tests).
+- [ ] **Integration testing** — full-path tests with a real database via Testcontainers + WebApplicationFactory (Phase 10).
 ---
 
 ## Video Series
