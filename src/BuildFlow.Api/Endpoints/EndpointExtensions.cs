@@ -18,7 +18,13 @@ internal static class EndpointExtensions
         app.MapInviteUserEndpoint();
 
         // Projects module
+        // Projects module
         app.MapCreateProjectEndpoint();
         app.MapGetProjectsEndpoint();
+        app.MapGetProjectEndpoint();
+        app.MapUpdateProjectEndpoint();
+        app.MapChangeProjectStatusEndpoint();
+        app.MapAddMemberEndpoint();
+        app.MapRemoveMemberEndpoint();
     }
 }

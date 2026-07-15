@@ -9,7 +9,7 @@ namespace BuildFlow.Api.Errors;
 // Endpoints call result.ToProblem() and stay free of mapping logic.
 internal static class ResultExtensions
 {
-    public static IResult ToProblem<T>(this Result<T> result)
+    public static IResult ToProblem(this ResultBase result)
     {
         // Read the first error as our structured AppError to get its Code.
         // Fall back to a generic 400 if the error is not an AppError.
