@@ -60,14 +60,17 @@ try
         app.UseSwaggerUI();
     }
 
-    // Logs one structured line per HTTP request (method, path, status, timing).
+   app.UseHttpsRedirection();
+
+    // المصادقة أولاً، فتُقرأ الهوية من الرمز
+    app.UseAuthentication();
+
+    // ثم إثراء السياق بالهوية، فتتوفّر لكل ما بعده
+    app.UseMiddleware<BuildFlow.Api.Logging.RequestContextEnrichmentMiddleware>();
+
+    // ثم تسجيل الطلبات، فيحمل كل سطر طلب هوية صاحبه
     app.UseSerilogRequestLogging();
 
-    app.UseHttpsRedirection();
-    
-    // Order matters: authentication first (who are you?),
-    // then authorization (are you allowed?).
-    app.UseAuthentication();
     app.UseAuthorization();
     
     // Vertical-slice endpoints will be mapped here in later batches.
