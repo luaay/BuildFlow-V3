@@ -8,6 +8,7 @@ using BuildFlow.Api.Endpoints;
 using BuildFlow.Api.Documentation;
 using BuildFlow.Projects.Application;
 using BuildFlow.Projects.Infrastructure;
+using Microsoft.Extensions.Hosting;
 
 using IdentityCurrentUser = BuildFlow.Identity.Application.Abstractions.ICurrentUserService;
 using ProjectsCurrentUser = BuildFlow.Projects.Application.Abstractions.ICurrentUserService;
@@ -79,7 +80,8 @@ try
 
     app.Run();
 }
-catch (Exception ex)
+catch (Exception ex) when (ex is not HostAbortedException
+    && ex.GetType().Name != "HostAbortedException")
 {
     Log.Fatal(ex, "BuildFlow API host terminated unexpectedly");
 }
@@ -87,3 +89,5 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+public partial class Program { }
