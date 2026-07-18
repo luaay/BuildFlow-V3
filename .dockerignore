@@ -1,0 +1,24 @@
+# مجلّدات البناء والإخراج
+**/bin/
+**/obj/
+**/out/
+
+# ملفّات المحرّر والبيئة
+.vs/
+.vscode/
+.idea/
+*.user
+
+# جيت
+.git/
+.gitignore
+
+# السجلّات المحلّية
+**/logs/
+
+# ملفّات الحاوية نفسها
+Dockerfile
+.dockerignore
+
+# أسرار محلّية إن وُجدت
+**/appsettings.Development.json

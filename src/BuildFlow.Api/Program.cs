@@ -10,6 +10,16 @@ using BuildFlow.Projects.Application;
 using BuildFlow.Projects.Infrastructure;
 using Microsoft.Extensions.Hosting;
 
+using BuildFlow.Identity.Infrastructure.Persistence;
+using BuildFlow.Projects.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+
 using IdentityCurrentUser = BuildFlow.Identity.Application.Abstractions.ICurrentUserService;
 using ProjectsCurrentUser = BuildFlow.Projects.Application.Abstractions.ICurrentUserService;
 
@@ -53,6 +63,20 @@ try
     builder.Services.AddJwtAuthentication(builder.Configuration);
 
     var app = builder.Build();
+
+// إنشاء مخطّط قاعدة البيانات عند الإقلاع
+using (var scope = app.Services.CreateScope())
+{
+    var identityDb = scope.ServiceProvider
+        .GetRequiredService<IdentityDbContext>();
+    var projectsDb = scope.ServiceProvider
+        .GetRequiredService<ProjectsDbContext>();
+
+    await identityDb.Database.EnsureCreatedAsync();
+
+    var projectsCreator = projectsDb.GetService<IRelationalDatabaseCreator>();
+    await projectsCreator.CreateTablesAsync();
+}
 
     // --- HTTP pipeline ---
     if (app.Environment.IsDevelopment())

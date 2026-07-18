@@ -1,0 +1,40 @@
+services:
+  # قاعdة البيانات في حاوية
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - buildflow-data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${DB_PASSWORD}" -C -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # تطبيق الواجهة في حاوية
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      # سلسلتا الاتصال تشيران إلى حاوية قاعدة البيانات باسم خدمتها
+      ConnectionStrings__IdentityDb: "Server=database;Database=BuildFlow;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;"
+      ConnectionStrings__ProjectsDb: "Server=database;Database=BuildFlow;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;"
+      # أسرار الرمز من متغيّرات البيئة
+      Jwt__SecretKey: "${JWT_SECRET}"
+      Jwt__Issuer: "BuildFlow"
+      Jwt__Audience: "BuildFlow"
+      Jwt__ExpiryMinutes: "60"
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  buildflow-data:
