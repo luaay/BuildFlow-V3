@@ -48,6 +48,6 @@ internal static class RegisterTenantEndpoint
         return result.IsFailed
             ? result.ToProblem()
             : Results.Ok(result.Value);
-        return Results.Ok(result.Value);
+        
     }
 }

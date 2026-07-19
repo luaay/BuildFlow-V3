@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using BuildFlow.Application.Abstractions.Behaviors;
 
 namespace BuildFlow.Projects.Application;
 
@@ -12,8 +13,13 @@ public static class DependencyInjection
         var assembly = Assembly.GetExecutingAssembly();
 
         // تسجيل كل معالجات الوسيط في هذه التجميعة تلقائياً
-        services.AddMediatR(config =>
-            config.RegisterServicesFromAssembly(assembly));
+         services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(assembly);
+
+            // سجّل سلوك التحقّق في الأنبوب Pipeline
+            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        });
 
         // تسجيل كل المتحقّقات في هذه التجميعة تلقائياً
         services.AddValidatorsFromAssembly(assembly);

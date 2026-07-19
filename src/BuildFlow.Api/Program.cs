@@ -3,7 +3,7 @@ using BuildFlow.Identity.Infrastructure;
 // using BuildFlow.Identity.Application.Abstractions;
 using BuildFlow.Api.Authentication;
 using Serilog;
-using BuildFlow.Api.Authentication;
+
 using BuildFlow.Api.Endpoints;
 using BuildFlow.Api.Documentation;
 using BuildFlow.Projects.Application;
@@ -16,9 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
+
 
 using IdentityCurrentUser = BuildFlow.Identity.Application.Abstractions.ICurrentUserService;
 using ProjectsCurrentUser = BuildFlow.Projects.Application.Abstractions.ICurrentUserService;
@@ -65,6 +63,7 @@ try
     var app = builder.Build();
 
 // إنشاء مخطّط قاعدة البيانات عند الإقلاع
+// إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن لم يكن موجوداً
 using (var scope = app.Services.CreateScope())
 {
     var identityDb = scope.ServiceProvider
@@ -74,8 +73,12 @@ using (var scope = app.Services.CreateScope())
 
     await identityDb.Database.EnsureCreatedAsync();
 
+    // أنشئ جداول المشاريع فقط إن لم تكن موجودة
     var projectsCreator = projectsDb.GetService<IRelationalDatabaseCreator>();
-    await projectsCreator.CreateTablesAsync();
+    if (!await projectsCreator.HasTablesAsync())
+    {
+        await projectsCreator.CreateTablesAsync();
+    }
 }
 
     // --- HTTP pipeline ---
