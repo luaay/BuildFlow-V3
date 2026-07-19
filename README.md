@@ -196,7 +196,7 @@ dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infr
 - [x] **Phase 5** — API layer (Minimal APIs, JWT auth, current-user service, central error translation, Serilog, Swagger)
 - [x] **Phase 6** — Projects module: domain (+18 unit tests), application (7 vertical slices), infrastructure (EF Core, migration applied), and API (all 7 endpoints: create, list, get-by-id, update, change-status, add-member, remove-member). Verified end-to-end via Swagger, including lifecycle transition guards and the last-lead invariant.
 - [ ] **Phase 7** — Documents module (review workflow)
-- [ ] **Phase 8** — MediatR pipeline (validation + logging)
+- [x] **Phase 8** — MediatR pipeline: logging, validation (short-circuits invalid commands before the handler), and performance behaviors, registered per module.
 - [ ] **Phase 9** — Docker, CI/CD, documentation
 - [ ] **Phase 10** — Integration testing (Testcontainers + WebApplicationFactory) across all modules
 - [ ] **Phase 11** — OpenTelemetry (distributed tracing)
