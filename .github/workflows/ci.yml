@@ -1,0 +1,37 @@
+name: CI
+
+# متى تعمل السلسلة: عند الدفع والطلبات إلى الفرع الرئيسيّ
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) اجلب الكود
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2) جهّز عدّة التطوير الثامنة
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # 3) استرجع الحزم
+      - name: Restore
+        run: dotnet restore
+
+      # 4) ابنِ الحلّ دون إعادة استرجاع
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      # 5) شغّل اختبارات الوحدة فقط
+      - name: Unit Tests
+        run: |
+          dotnet test tests/BuildFlow.Identity.Domain.UnitTests/BuildFlow.Identity.Domain.UnitTests.csproj --no-build --configuration Release
+          dotnet test tests/BuildFlow.Projects.Domain.UnitTests/BuildFlow.Projects.Domain.UnitTests.csproj --no-build --configuration Release
