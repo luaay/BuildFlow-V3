@@ -1,4 +1,5 @@
 # BuildFlow-V3
+[![CI](https://github.com/luaay/BuildFlow-V3/actions/workflows/ci.yml/badge.svg)](https://github.com/luaay/BuildFlow-V3/actions/workflows/ci.yml)
 
 **Engineering Document Workflow SaaS** — a multi-tenant platform for engineering offices and contracting firms to manage documents through a structured review and approval lifecycle.
 
@@ -30,6 +31,35 @@ Built as a portfolio project to demonstrate professional .NET architecture: Modu
 1. **Identity** — Tenants, Users, Roles, JWT authentication.
 2. **Projects** — CRUD, status lifecycle, team members.
 3. **Documents** — full review workflow: Draft → Review → Approved / Rejected → Superseded.
+
+---
+
+## Running with Docker
+
+The entire system — API and database — runs with a single command.
+
+**Prerequisites:** Docker Desktop running.
+
+1. Create a `.env` file in the repository root:
+
+DB_PASSWORD=your_strong_password_here
+JWT_SECRET=your_long_secret_signing_key_here
+
+2. Start everything:
+
+```bash
+docker compose up -d --build
+```
+
+The API listens on `http://localhost:8080`. The database schema is created automatically on startup.
+
+To stop and remove the containers:
+
+```bash
+docker compose down
+```
+
+> Note: `.env` is git-ignored and never committed. Secrets stay local.
 
 ---
 
@@ -177,7 +207,9 @@ dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infr
 
 - [x] **Structured logging** — request-context enrichment middleware pushing UserId and TenantId into the Serilog LogContext; machine/thread enrichers; console and rolling-file sinks with property output.
 - [x] **Expanded unit tests** — Identity domain (25 tests) and Projects domain (44 tests: factory, full lifecycle, member rules incl. last-lead on both paths, and direct Money/ProjectCode value-object tests).
-- [ ] **Integration testing** — full-path tests with a real database via Testcontainers + WebApplicationFactory (Phase 10).
+- [x] **Integration testing** — full-path tests against a real SQL Server via Testcontainers + WebApplicationFactory: tenant registration persistence, the complete register→login→access-protected authentication flow, and cross-tenant isolation.
+- [x] **Containerization** — multi-stage Dockerfile and docker-compose running the API alongside SQL Server; secrets supplied through environment variables, schema created at startup. The whole system runs with a single command.
+- [x] **CI pipeline** — GitHub Actions workflow building the solution in Release and running all domain unit tests on every push and pull request.
 ---
 
 ## Video Series
