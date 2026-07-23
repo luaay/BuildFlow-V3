@@ -35,3 +35,4 @@ jobs:
         run: |
           dotnet test tests/BuildFlow.Identity.Domain.UnitTests/BuildFlow.Identity.Domain.UnitTests.csproj --no-build --configuration Release
           dotnet test tests/BuildFlow.Projects.Domain.UnitTests/BuildFlow.Projects.Domain.UnitTests.csproj --no-build --configuration Release
+          dotnet test tests/BuildFlow.Documents.Domain.UnitTests/BuildFlow.Documents.Domain.UnitTests.csproj --no-build --configuration Release
