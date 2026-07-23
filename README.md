@@ -206,7 +206,7 @@ dotnet ef database update --project src/Modules/Identity/BuildFlow.Identity.Infr
 ### Cross-cutting improvements (layered on top of the phases above)
 
 - [x] **Structured logging** — request-context enrichment middleware pushing UserId and TenantId into the Serilog LogContext; machine/thread enrichers; console and rolling-file sinks with property output.
-- [x] **Expanded unit tests** — Identity domain (25 tests) and Projects domain (44 tests: factory, full lifecycle, member rules incl. last-lead on both paths, and direct Money/ProjectCode value-object tests).
+- [x] **Expanded unit tests** — 90 domain tests across all three modules: Identity (25), Projects (44), and Documents (21), covering factories, lifecycle and workflow transitions, invariant guards, and value objects.
 - [x] **Integration testing** — full-path tests against a real SQL Server via Testcontainers + WebApplicationFactory: tenant registration persistence, the complete register→login→access-protected authentication flow, and cross-tenant isolation.
 - [x] **Containerization** — multi-stage Dockerfile and docker-compose running the API alongside SQL Server; secrets supplied through environment variables, schema created at startup. The whole system runs with a single command.
 - [x] **CI pipeline** — GitHub Actions workflow building the solution in Release and running all domain unit tests on every push and pull request.
