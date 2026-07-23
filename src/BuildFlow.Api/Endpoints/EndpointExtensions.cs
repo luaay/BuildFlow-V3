@@ -2,6 +2,7 @@ using BuildFlow.Api.Endpoints.Auth;
 using BuildFlow.Api.Endpoints.Projects;
 using BuildFlow.Api.Endpoints.Tenants;
 using BuildFlow.Api.Endpoints.Users;
+using BuildFlow.Api.Endpoints.Documents;
 
 namespace BuildFlow.Api.Endpoints;
 
@@ -26,5 +27,15 @@ internal static class EndpointExtensions
         app.MapChangeProjectStatusEndpoint();
         app.MapAddMemberEndpoint();
         app.MapRemoveMemberEndpoint();
+
+
+        // Documents module
+        app.MapCreateDocumentEndpoint();
+        app.MapGetDocumentsEndpoint();
+        app.MapGetDocumentEndpoint();
+        app.MapSubmitForReviewEndpoint();
+        app.MapApproveDocumentEndpoint();
+        app.MapRejectDocumentEndpoint();
+        app.MapAddVersionEndpoint();
     }
 }

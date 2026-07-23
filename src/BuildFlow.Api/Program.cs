@@ -16,10 +16,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 
-
+using DocumentsCurrentUser = BuildFlow.Documents.Application.Abstractions.ICurrentUserService;
 
 using IdentityCurrentUser = BuildFlow.Identity.Application.Abstractions.ICurrentUserService;
 using ProjectsCurrentUser = BuildFlow.Projects.Application.Abstractions.ICurrentUserService;
+using BuildFlow.Documents.Application;
+using BuildFlow.Documents.Infrastructure;
 
 // Bootstrap logger: a temporary logger so that even failures during
 // host startup get logged before the full configuration is read.
@@ -47,6 +49,9 @@ try
     builder.Services.AddProjectsApplication();
     builder.Services.AddProjectsInfrastructure(builder.Configuration);
 
+    builder.Services.AddDocumentsApplication();
+    builder.Services.AddDocumentsInfrastructure(builder.Configuration);
+
     builder.Services.AddBuildFlowSwagger();
 
     // Identity from the current HTTP request. Scoped: one identity per request.
@@ -56,6 +61,7 @@ try
    // Identity current-user (strong IDs) and Projects current-user (raw Guids).
     builder.Services.AddScoped<IdentityCurrentUser, CurrentUserService>();
     builder.Services.AddScoped<ProjectsCurrentUser, ProjectsCurrentUserService>();
+    builder.Services.AddScoped<DocumentsCurrentUser, DocumentsCurrentUserService>();
 
     // JWT authentication + authorization, bound to the same Jwt options.
     builder.Services.AddJwtAuthentication(builder.Configuration);

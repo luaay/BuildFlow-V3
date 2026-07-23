@@ -26,6 +26,7 @@
     <ProjectReference Include="..\Modules\Identity\BuildFlow.Identity.Infrastructure\BuildFlow.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Projects\BuildFlow.Projects.Application\BuildFlow.Projects.Application.csproj" />
     <ProjectReference Include="..\Modules\Projects\BuildFlow.Projects.Infrastructure\BuildFlow.Projects.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Documents\BuildFlow.Documents.Infrastructure\BuildFlow.Documents.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
