@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 
 using BuildFlow.Identity.Infrastructure.Persistence;
 using BuildFlow.Projects.Infrastructure.Persistence;
+using BuildFlow.Documents.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -70,23 +71,31 @@ try
 
 // إنشاء مخطّط قاعدة البيانات عند الإقلاع
 // إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن لم يكن موجوداً
+// إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن لم يكن موجوداً
 using (var scope = app.Services.CreateScope())
 {
     var identityDb = scope.ServiceProvider
         .GetRequiredService<IdentityDbContext>();
     var projectsDb = scope.ServiceProvider
         .GetRequiredService<ProjectsDbContext>();
+    var documentsDb = scope.ServiceProvider
+        .GetRequiredService<DocumentsDbContext>();
+
+    var projectsCreator = projectsDb.GetService<IRelationalDatabaseCreator>();
+    var documentsCreator = documentsDb.GetService<IRelationalDatabaseCreator>();
+
+    // افحص قبل إنشاء أيّ شيء
+    var databaseHadTables = await projectsCreator.ExistsAsync()
+        && await projectsCreator.HasTablesAsync();
 
     await identityDb.Database.EnsureCreatedAsync();
 
-    // أنشئ جداول المشاريع فقط إن لم تكن موجودة
-    var projectsCreator = projectsDb.GetService<IRelationalDatabaseCreator>();
-    if (!await projectsCreator.HasTablesAsync())
+    if (!databaseHadTables)
     {
         await projectsCreator.CreateTablesAsync();
+        await documentsCreator.CreateTablesAsync();
     }
 }
-
     // --- HTTP pipeline ---
     if (app.Environment.IsDevelopment())
     {
