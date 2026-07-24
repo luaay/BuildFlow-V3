@@ -72,26 +72,27 @@ try
 // إنشاء مخطّط قاعدة البيانات عند الإقلاع
 // إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن لم يكن موجوداً
 // إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن لم يكن موجوداً
+// إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن كانت فارغة
 using (var scope = app.Services.CreateScope())
 {
-    var identityDb = scope.ServiceProvider
-        .GetRequiredService<IdentityDbContext>();
-    var projectsDb = scope.ServiceProvider
-        .GetRequiredService<ProjectsDbContext>();
-    var documentsDb = scope.ServiceProvider
-        .GetRequiredService<DocumentsDbContext>();
+    var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+    var projectsDb = scope.ServiceProvider.GetRequiredService<ProjectsDbContext>();
+    var documentsDb = scope.ServiceProvider.GetRequiredService<DocumentsDbContext>();
 
+    var identityCreator = identityDb.GetService<IRelationalDatabaseCreator>();
     var projectsCreator = projectsDb.GetService<IRelationalDatabaseCreator>();
     var documentsCreator = documentsDb.GetService<IRelationalDatabaseCreator>();
 
-    // افحص قبل إنشاء أيّ شيء
-    var databaseHadTables = await projectsCreator.ExistsAsync()
-        && await projectsCreator.HasTablesAsync();
-
-    await identityDb.Database.EnsureCreatedAsync();
-
-    if (!databaseHadTables)
+    // أنشئ القاعدة إن لم تكن موجودة أصلاً
+    if (!await identityCreator.ExistsAsync())
     {
+        await identityCreator.CreateAsync();
+    }
+
+    // أنشئ الجداول إن كانت القاعدة فارغة
+    if (!await identityCreator.HasTablesAsync())
+    {
+        await identityCreator.CreateTablesAsync();
         await projectsCreator.CreateTablesAsync();
         await documentsCreator.CreateTablesAsync();
     }
