@@ -26,3 +26,17 @@ export async function getUsers(): Promise<PagedResult<User>> {
   const response = await apiClient.get<PagedResult<User>>("/api/users");
   return response.data;
 }
+
+
+// ما نرسله لدعوة مستخdم، يطابق أمر الخادم
+export interface InviteUserRequest {
+  email: string;
+  fullName: string;
+  initialPassword: string;
+  role: number;
+}
+
+// دالّة دعوة مستخدم جديد للمستأجر
+export async function inviteUser(data: InviteUserRequest): Promise<void> {
+  await apiClient.post("/api/users/invite", data);
+}
