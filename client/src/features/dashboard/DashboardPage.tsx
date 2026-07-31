@@ -9,6 +9,7 @@ import { getDocuments } from "../documents/document.api";
 // ── لوحة قسم حديث: عنوان، ورابط عرض الكل، ومحتوى أو رسالة فراغ ──
 import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useAuth } from "../auth/useAuth";
 
 export function DashboardPage() {
   // ── استعلامان: المشاريع والمستندات ──
@@ -16,6 +17,8 @@ export function DashboardPage() {
     queryKey: ["projects"],
     queryFn: getProjects,
   });
+
+  const { user } = useAuth();
 
   const documentsQuery = useQuery({
     queryKey: ["documents"],
@@ -39,7 +42,7 @@ export function DashboardPage() {
     <AppLayout title="Dashboard">
       {/* الترحيب */}
       <h2 className="text-2xl font-bold text-[var(--color-text-primary)]">
-        Welcome back 👋
+        Welcome back, {user?.fullName?.split(" ")[0] ?? "there"} 👋
       </h2>
       <p className="text-[var(--color-text-secondary)] mt-1 mb-8">
         Here's what's happening across your projects today.

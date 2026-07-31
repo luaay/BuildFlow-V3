@@ -18,7 +18,19 @@ export function LoginPage() {
   const mutation = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
+      // احفظ الرمز
       localStorage.setItem("accessToken", data.accessToken);
+
+      // احفظ بيانات المستخدم، لنعرضها في الترحيب والشريط الجانبيّ
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          fullName: data.fullName,
+          role: data.role,
+          tenantSlug: data.tenantSlug,
+        })
+      );
+
       navigate("/dashboard");
     },
   });

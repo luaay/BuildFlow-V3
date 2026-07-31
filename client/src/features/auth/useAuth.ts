@@ -1,19 +1,26 @@
-// خطّاف المصادقة: يجيب سؤالاً واحداً — هل المستخدم مسجّل الدخول؟
-// يعتمد على وجود الرمز في التخزين المحلّيّ
+// خطّاف المصادقة: يجيب هل المستخدم داخل، ويعطي بياناته ودالّة الخروج
+
+// شكل بيانات المستخدم المحفوظة
+interface StoredUser {
+  fullName: string;
+  role: string;
+  tenantSlug: string;
+}
 
 export function useAuth() {
-  // اقرأ الرمز من التخزين المحلّيّ
   const token = localStorage.getItem("accessToken");
-
-  // المستخدم داخل إن وُجد رمز
   const isAuthenticated = !!token;
 
-  // دالّة الخروج: تحذف الرمز
+  // اقرأ بيانات المستخدم، وحوّلها من نصّ إلى كائن
+  const userJson = localStorage.getItem("user");
+  const user: StoredUser | null = userJson ? JSON.parse(userJson) : null;
+
+  // دالّة الخروج: تحذف الرمز والبيانات، وتعيد للدخول
   const logout = () => {
     localStorage.removeItem("accessToken");
-    // أعِد التوجيه إلى الدخول
+    localStorage.removeItem("user");
     window.location.href = "/login";
   };
 
-  return { isAuthenticated, logout };
+  return { isAuthenticated, user, logout };
 }
