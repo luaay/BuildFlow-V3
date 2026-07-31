@@ -222,6 +222,8 @@ This project is built and explained step by step on YouTube, focusing on archite
 The current series is in Arabic; an English series is planned.
 
 ---
+> Swagger is intentionally enabled in production so the live demo can be explored. In a real production system it would be restricted.
+---
 
 ## License
 

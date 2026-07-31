@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+/* ── الهويّة البصرية: ألوان مستخرَجة من التصميم ── */
+@theme {
+  /* خلفيات خضراء داكنة متدرّجة، لا سوداء */
+  --color-bg-base: #0d1512;      /* الخلفية، خضراء داكنة */
+  --color-bg-surface: #131e1a;   /* البطاقات */
+  --color-bg-elevated: #1a2822;  /* الحقول والعناصر المرتفعة */
+
+  --color-border-subtle: #24352e;
+
+  --color-text-primary: #e8f0ec;
+  --color-text-secondary: #7a8f86;
+
+  --color-accent: #10b981;
+  --color-accent-hover: #059669;
+
+  --color-purple: #8b5cf6;
+  --color-purple-hover: #7c3aed;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+}

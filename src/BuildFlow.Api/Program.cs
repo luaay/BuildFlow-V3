@@ -67,6 +67,17 @@ try
     // JWT authentication + authorization, bound to the same Jwt options.
     builder.Services.AddJwtAuthentication(builder.Configuration);
 
+    // سياسة السماح للواجهة الأمامية بالاتصال
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")  // أصل الواجهة في التطوير
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
     var app = builder.Build();
 
 // إنشاء مخطّط قاعدة البيانات عند الإقلاع
@@ -98,13 +109,19 @@ using (var scope = app.Services.CreateScope())
     }
 }
     // --- HTTP pipeline ---
-    if (app.Environment.IsDevelopment())
-    {
+    //if (app.Environment.IsDevelopment())
+    //{
+    //    app.UseSwagger();
+    //    app.UseSwaggerUI();
+    //}
+
+        // التوثيق مفعّل في كل البيئات، فهذا مشروع محفظة يُجرَّب حيّاً
         app.UseSwagger();
         app.UseSwaggerUI();
-    }
 
-   app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
+
+    app.UseCors("AllowFrontend");
 
     // المصادقة أولاً، فتُقرأ الهوية من الرمز
     app.UseAuthentication();
