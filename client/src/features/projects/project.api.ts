@@ -21,3 +21,23 @@ export async function getProject(id: string): Promise<ProjectDetail> {
 
   return response.data;
 }
+
+// ما نرسله لإنشاء مشروع، يطابق أمر الخادم
+export interface CreateProjectRequest {
+  name: string;
+  code: string;
+  description: string;
+  budget: number;
+  currency: string;
+  clientName: string;
+  location: string;
+  startDate: string | null;
+  endDate: string | null;
+}
+
+// دالّة إنشاء المشروع
+export async function createProject(
+  data: CreateProjectRequest
+): Promise<void> {
+  await apiClient.post("/api/projects", data);
+}
