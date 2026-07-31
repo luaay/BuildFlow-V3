@@ -7,10 +7,15 @@ import { ProtectedRoute } from "./features/auth/ProtectedRoute";
 import { ProjectsPage } from "./features/projects/ProjectsPage";
 import { ProjectDetailPage } from "./features/projects/ProjectDetailPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { RegisterPage } from "./features/auth/RegisterPage";
 
 function App() {
   return (
     <Routes>
+
+      {/* مسار التسجيل: مفتوح */}
+      <Route path="/register" element={<RegisterPage />} />
+      
       {/* مسار الدخول: مفتوح، بلا حماية */}
       <Route path="/login" element={<LoginPage />} />
 

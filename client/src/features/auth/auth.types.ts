@@ -17,3 +17,13 @@ export interface LoginResponse {
   tenantId: string;
   tenantSlug: string;
 }
+
+// ما نرسله عند التسجيل، يطابق ما يتوقّعه الخادم
+export interface RegisterRequest {
+  tenantName: string;      // اسم الشركة
+  slug: string;            // معرّف مساحة العمل
+  plan: number;            // الخطّة، نثبّتها مؤقّتاً
+  ownerEmail: string;
+  ownerPassword: string;
+  ownerFullName: string;   // الاسم الأوّل والأخير مدموجين
+}
