@@ -41,3 +41,26 @@ export async function createProject(
 ): Promise<void> {
   await apiClient.post("/api/projects", data);
 }
+
+// دالّة تغيير حالة المشروع
+// الجسم يحمل الحالة المستهدفة رقماً، كما يتوقّع الخادم
+export async function changeProjectStatus(
+  id: string,
+  targetStatus: number
+): Promise<void> {
+  await apiClient.patch(`/api/projects/${id}/status`, { targetStatus });
+}
+
+
+// دالّة إضافة عضt للمشروع
+// الجسم يحمل معرّف المستخدم والدور رقماً
+export async function addProjectMember(
+  projectId: string,
+  userId: string,
+  role: number
+): Promise<void> {
+  await apiClient.post(`/api/projects/${projectId}/members`, {
+    userId,
+    role,
+  });
+}
