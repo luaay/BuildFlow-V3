@@ -22,6 +22,17 @@ export function ProjectDetailPage() {
     queryFn: () => getProject(id!),
   });
 
+  // نجلب المستخدمين، لنطابق معرّف العضt باسمه
+  const usersQuery = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
+
+  // خريطة من المعرّف إلى بيانات المستخدم، للبحث السريع
+  const usersById = new Map(
+    (usersQuery.data?.items ?? []).map((u) => [u.id, u])
+  );
+
   const queryClient = useQueryClient();
 
   // عملية تغيير الحالة
@@ -130,14 +141,24 @@ export function ProjectDetailPage() {
               className="flex items-center gap-3 p-3 bg-[var(--color-bg-elevated)] rounded-xl"
             >
               {/* دائرة بحرف، مؤقّتاً من المعرّف */}
+              {/* دائرة بحرف اسم العضt */}
               <div className="w-9 h-9 rounded-full bg-[var(--color-purple)] flex items-center justify-center text-white text-sm font-medium">
-                {member.userId.charAt(0).toUpperCase()}
+                {(usersById.get(member.userId)?.fullName ?? "?")
+                  .charAt(0)
+                  .toUpperCase()}
               </div>
               <div className="flex-1">
-                {/* المعرّف الخام مؤقّتاً، سنحسّنه لاحقاً */}
+                {/* الاسم إن وُجد، وإلا المعرّف مقصوصاً */}
                 <p className="text-sm text-[var(--color-text-primary)]">
-                  {member.userId.slice(0, 8)}...
+                  {usersById.get(member.userId)?.fullName ??
+                    `${member.userId.slice(0, 8)}...`}
                 </p>
+                {/* البريد تحت الاسم، إن وُجد */}
+                {usersById.get(member.userId)?.email && (
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    {usersById.get(member.userId)?.email}
+                  </p>
+                )}
               </div>
               <span className="text-xs text-[var(--color-text-secondary)]">
                 {member.role}
