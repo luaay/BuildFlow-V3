@@ -126,6 +126,13 @@ export function LoginPage() {
           >
             {mutation.isPending ? "Signing in..." : "Sign In"}
           </button>
+          {/* رابط التسجيل للجدد */}
+          <p className="text-center text-sm text-[var(--color-text-secondary)]">
+            Don't have a workspace?{" "}
+            <a href="/register" className="text-[var(--color-accent)] hover:underline">
+              Create one
+            </a>
+          </p>
         </form>
       </div>
     </div>
