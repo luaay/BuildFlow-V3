@@ -9,6 +9,7 @@ import { ProjectDetailPage } from "./features/projects/ProjectDetailPage";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { RegisterPage } from "./features/auth/RegisterPage";
 import { UsersPage } from "./features/users/UsersPage";
+import { DocumentsPage } from "./features/documents/DocumentsPage";
 
 function App() {
   return (
@@ -46,6 +47,16 @@ function App() {
         element={
           <ProtectedRoute>
             <ProjectDetailPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* المستندات: محميّ */}
+      <Route
+        path="/documents"
+        element={
+          <ProtectedRoute>
+            <DocumentsPage />
           </ProtectedRoute>
         }
       />

@@ -31,3 +31,50 @@ export async function getDocuments(): Promise<PagedResult<DocumentSummary>> {
   );
   return response.data;
 }
+
+// ── دوالّ سير المراجعة ──
+
+// تقديم المستند للمراجعة، بتعيين مراجع
+export async function submitForReview(
+  documentId: string,
+  reviewerId: string
+): Promise<void> {
+  await apiClient.post(`/api/documents/${documentId}/submit-for-review`, {
+    reviewerId,
+  });
+}
+
+// اعتماد المستند
+export async function approveDocument(
+  documentId: string,
+  notes: string | null
+): Promise<void> {
+  await apiClient.post(`/api/documents/${documentId}/approve`, { notes });
+}
+
+// رفض المستند
+export async function rejectDocument(
+  documentId: string,
+  notes: string | null
+): Promise<void> {
+  await apiClient.post(`/api/documents/${documentId}/reject`, { notes });
+}
+
+// ما نرسله لإنشاء مستند
+export interface CreateDocumentRequest {
+  projectId: string;
+  title: string;
+  description: string;
+  type: number;
+  fileName: string;
+  filePath: string;
+  fileSizeBytes: number;
+  contentType: string;
+}
+
+// دالّة إنشاء المستند
+export async function createDocument(
+  data: CreateDocumentRequest
+): Promise<void> {
+  await apiClient.post("/api/documents", data);
+}
