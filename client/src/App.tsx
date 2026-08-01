@@ -10,6 +10,7 @@ import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { RegisterPage } from "./features/auth/RegisterPage";
 import { UsersPage } from "./features/users/UsersPage";
 import { DocumentsPage } from "./features/documents/DocumentsPage";
+import { AuditLogPage } from "./features/audit/AuditLogPage";
 
 function App() {
   return (
@@ -70,7 +71,15 @@ function App() {
           </ProtectedRoute>
         }
       />
-
+      {/* سجلّ التدقيق: محميّ، مؤقّت */}
+      <Route
+        path="/audit-log"
+        element={
+          <ProtectedRoute>
+            <AuditLogPage />
+          </ProtectedRoute>
+        }
+      />
       {/* المسار الجذر: حوّل إلى المشاريع */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>
