@@ -2,6 +2,7 @@ using BuildFlow.SharedKernel.Domain.Auditing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MediatR;
 
 namespace BuildFlow.SharedInfrastructure.Auditing;
 
@@ -22,6 +23,11 @@ public static class AuditServiceCollectionExtensions
 
         // الاعتراض Interceptor، بنطاق الطلب scoped
         services.AddScoped<AuditInterceptor>();
+
+        // نسجّل معالجات MediatR في هذا المشروع، ليجد معالج استعلام التدقيق
+        services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(
+                typeof(AuditServiceCollectionExtensions).Assembly));
 
         return services;
     }

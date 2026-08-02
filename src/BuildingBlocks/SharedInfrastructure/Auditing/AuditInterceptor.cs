@@ -141,7 +141,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider)
     private static Guid GetTenantId(IHttpContextAccessor httpContextAccessor)
     {
         var tenantIdClaim = httpContextAccessor.HttpContext?.User
-            .FindFirst("tenantId")?.Value;
+            .FindFirst("tenant")?.Value;
 
         return Guid.TryParse(tenantIdClaim, out var tenantId)
             ? tenantId

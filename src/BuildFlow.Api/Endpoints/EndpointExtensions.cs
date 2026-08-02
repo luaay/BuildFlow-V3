@@ -3,6 +3,7 @@ using BuildFlow.Api.Endpoints.Projects;
 using BuildFlow.Api.Endpoints.Tenants;
 using BuildFlow.Api.Endpoints.Users;
 using BuildFlow.Api.Endpoints.Documents;
+using BuildFlow.Api.Endpoints.Audit;
 
 namespace BuildFlow.Api.Endpoints;
 
@@ -37,5 +38,8 @@ internal static class EndpointExtensions
         app.MapApproveDocumentEndpoint();
         app.MapRejectDocumentEndpoint();
         app.MapAddVersionEndpoint();
+
+        // Audit module
+        app.MapGetAuditLogEndpoint();
     }
 }
