@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BuildFlow.Documents.Application\BuildFlow.Documents.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\SharedInfrastructure\BuildFlow.SharedInfrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

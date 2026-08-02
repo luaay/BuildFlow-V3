@@ -4,6 +4,7 @@
     <ProjectReference Include="..\BuildFlow.Projects.Domain\BuildFlow.Projects.Domain.csproj" />
     <ProjectReference Include="..\BuildFlow.Projects.Application\BuildFlow.Projects.Application.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Application.Abstractions\BuildFlow.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\SharedInfrastructure\BuildFlow.SharedInfrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

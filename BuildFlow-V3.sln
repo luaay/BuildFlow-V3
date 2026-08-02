@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.Documents.Infrast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.Documents.Domain.UnitTests", "tests\BuildFlow.Documents.Domain.UnitTests\BuildFlow.Documents.Domain.UnitTests.csproj", "{BD3FD129-BEB8-44BE-922E-9FB961F6F762}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildFlow.SharedInfrastructure", "src\BuildingBlocks\SharedInfrastructure\BuildFlow.SharedInfrastructure.csproj", "{C5B33251-9C3F-431B-ABF9-6168C5A09941}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -119,6 +121,10 @@ Global
 		{BD3FD129-BEB8-44BE-922E-9FB961F6F762}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD3FD129-BEB8-44BE-922E-9FB961F6F762}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD3FD129-BEB8-44BE-922E-9FB961F6F762}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5B33251-9C3F-431B-ABF9-6168C5A09941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5B33251-9C3F-431B-ABF9-6168C5A09941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5B33251-9C3F-431B-ABF9-6168C5A09941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5B33251-9C3F-431B-ABF9-6168C5A09941}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -145,5 +151,6 @@ Global
 		{C85091D0-C60D-46A7-A513-20B855B0E19E} = {C13A7220-B984-4D28-A204-49F0C375D28D}
 		{295306BF-E2FD-4290-B2FF-570D681D84AC} = {C13A7220-B984-4D28-A204-49F0C375D28D}
 		{BD3FD129-BEB8-44BE-922E-9FB961F6F762} = {C02BD035-9F5A-40A2-AE1C-87F081C69442}
+		{C5B33251-9C3F-431B-ABF9-6168C5A09941} = {2D7851C4-E053-4D5A-A71F-D2AFB81A0C01}
 	EndGlobalSection
 EndGlobal

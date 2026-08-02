@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BuildFlow.Identity.Application\BuildFlow.Identity.Application.csproj" />
     <ProjectReference Include="..\BuildFlow.Identity.Domain\BuildFlow.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\SharedInfrastructure\BuildFlow.SharedInfrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

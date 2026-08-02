@@ -7,6 +7,7 @@ using BuildFlow.Identity.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using BuildFlow.SharedInfrastructure.Auditing;
 
 namespace BuildFlow.Identity.Infrastructure;
 
@@ -17,9 +18,12 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         // 1. DbContext
-        services.AddDbContext<IdentityDbContext>(options =>
-            options.UseSqlServer(
-                configuration.GetConnectionString("IdentityDb")));
+        // السياق بسلسلة اتصال الهوية، مع اعتراض التدقيق
+        services.AddDbContext<IdentityDbContext>((serviceProvider, options) =>
+            options
+                .UseSqlServer(configuration.GetConnectionString("IdentityDb"))
+                .AddInterceptors(
+                    serviceProvider.GetRequiredService<AuditInterceptor>()));
 
         // 2. المستودعات
         services.AddScoped<ITenantRepository, TenantRepository>();

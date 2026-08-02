@@ -5,6 +5,8 @@ using BuildFlow.Projects.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using BuildFlow.SharedInfrastructure.Auditing;
+
 
 namespace BuildFlow.Projects.Infrastructure;
 
@@ -14,10 +16,12 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // 1. DbContext بسلسلة اتصال المشاريع الخاصّة
-        services.AddDbContext<ProjectsDbContext>(options =>
-            options.UseSqlServer(
-                configuration.GetConnectionString("ProjectsDb")));
+        // السياق بسلسلة اتصال المشاريع، مع اعتراض التدقيق
+        services.AddDbContext<ProjectsDbContext>((serviceProvider, options) =>
+            options
+                .UseSqlServer(configuration.GetConnectionString("ProjectsDb"))
+                .AddInterceptors(
+                    serviceProvider.GetRequiredService<AuditInterceptor>()));
 
         // 2. المستودع
         services.AddScoped<IProjectRepository, ProjectRepository>();

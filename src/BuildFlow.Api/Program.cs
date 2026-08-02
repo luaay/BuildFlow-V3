@@ -23,6 +23,7 @@ using IdentityCurrentUser = BuildFlow.Identity.Application.Abstractions.ICurrent
 using ProjectsCurrentUser = BuildFlow.Projects.Application.Abstractions.ICurrentUserService;
 using BuildFlow.Documents.Application;
 using BuildFlow.Documents.Infrastructure;
+using BuildFlow.SharedInfrastructure.Auditing;
 
 // Bootstrap logger: a temporary logger so that even failures during
 // host startup get logged before the full configuration is read.
@@ -52,6 +53,9 @@ try
 
     builder.Services.AddDocumentsApplication();
     builder.Services.AddDocumentsInfrastructure(builder.Configuration);
+
+    // تركيب التدقيق: السياق، والمستودع، والاعتراض
+    builder.Services.AddAuditing(builder.Configuration);
 
     builder.Services.AddBuildFlowSwagger();
 
@@ -89,10 +93,12 @@ using (var scope = app.Services.CreateScope())
     var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
     var projectsDb = scope.ServiceProvider.GetRequiredService<ProjectsDbContext>();
     var documentsDb = scope.ServiceProvider.GetRequiredService<DocumentsDbContext>();
+    var auditDb = scope.ServiceProvider.GetRequiredService<AuditDbContext>();
 
     var identityCreator = identityDb.GetService<IRelationalDatabaseCreator>();
     var projectsCreator = projectsDb.GetService<IRelationalDatabaseCreator>();
     var documentsCreator = documentsDb.GetService<IRelationalDatabaseCreator>();
+    var auditCreator = auditDb.GetService<IRelationalDatabaseCreator>();
 
     // أنشئ القاعدة إن لم تكن موجودة أصلاً
     if (!await identityCreator.ExistsAsync())
@@ -106,6 +112,18 @@ using (var scope = app.Services.CreateScope())
         await identityCreator.CreateTablesAsync();
         await projectsCreator.CreateTablesAsync();
         await documentsCreator.CreateTablesAsync();
+    }
+
+    // جدول التدقيق: فحص مستقلّ، فقد أُضيف بعد إنشاء بقيّة الجداول
+    // نحاول إنشاءه، ونتجاهل الخطأ إن كان موجوداً أصلاً
+    try
+    {
+        await auditCreator.CreateTablesAsync();
+        Log.Information("Audit table created");
+    }
+    catch
+    {
+        // الجدول موجود أصلاً، لا حاجة لفعل شيء
     }
 }
     // --- HTTP pipeline ---
