@@ -14,9 +14,7 @@ public sealed class InviteUserValidator : AbstractValidator<InviteUserCommand>
             .NotEmpty().WithMessage("Full name is required.")
             .MaximumLength(150);
 
-        RuleFor(x => x.InitialPassword)
-            .NotEmpty().WithMessage("Initial password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters.");
+        
 
         RuleFor(x => x.Role)
             .IsInEnum().WithMessage("A valid role is required.");

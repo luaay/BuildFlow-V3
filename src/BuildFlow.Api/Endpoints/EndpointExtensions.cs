@@ -41,5 +41,8 @@ internal static class EndpointExtensions
 
         // Audit module
         app.MapGetAuditLogEndpoint();
+
+
+        app.MapActivateUserEndpoint();
     }
 }

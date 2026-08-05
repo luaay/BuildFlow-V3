@@ -45,6 +45,10 @@ internal sealed class LoginHandler(
         if (user.IsLockedOut())
             return Result.Fail(IdentityErrors.User.AccountLocked);
 
+            // المعلّق لا يدخل حتى يفعّل حسابه بالرمز
+        if (user.Status == UserStatus.Pending)
+            return Result.Fail(IdentityErrors.User.AccountInactive);
+
         // 5. فحص الحالة
         if (user.Status == UserStatus.Inactive)
             return Result.Fail(IdentityErrors.User.AccountInactive);

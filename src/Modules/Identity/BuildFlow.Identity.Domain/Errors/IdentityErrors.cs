@@ -39,5 +39,14 @@ public static class IdentityErrors
 
         public static AppError CannotInviteOwner =>
             new("User.CannotInviteOwner", "The Owner role cannot be assigned via invitation.");
+
+       public static AppError NotPendingActivation =>
+            new("User.NotPendingActivation", "This account is not pending activation.");
+
+        public static AppError InvalidActivationToken =>
+            new("User.InvalidActivationToken", "The activation token is invalid.");
+
+        public static AppError ActivationTokenExpired =>
+            new("User.ActivationTokenExpired", "The activation token has expired.");
     }
 }

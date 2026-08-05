@@ -24,4 +24,9 @@ public interface IUserRepository
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
+
+        // جلب مستخدم برمز تفعيله، للتفعيل
+    Task<User?> GetByActivationTokenAsync(
+        string activationToken,
+        CancellationToken cancellationToken = default);
 }

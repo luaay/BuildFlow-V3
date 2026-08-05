@@ -61,4 +61,15 @@ internal sealed class UserRepository(IdentityDbContext context) : IUserRepositor
 
         return (users, totalCount);
     }
+
+    // جلب مستخدم برمز تفعيله
+public async Task<User?> GetByActivationTokenAsync(
+    string activationToken,
+    CancellationToken cancellationToken = default)
+{
+    return await context.Users
+        .FirstOrDefaultAsync(
+            u => u.ActivationToken == activationToken,
+            cancellationToken);
+}
 }

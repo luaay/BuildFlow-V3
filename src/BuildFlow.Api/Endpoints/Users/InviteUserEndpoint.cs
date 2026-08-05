@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BuildFlow.Api.Endpoints.Users;
 
-// One endpoint class per vertical slice (REPR pattern).
-// Protected write: an authenticated user invites a new user into
-// their own tenant. Tenant and inviter come from the token, not the body.
+// نقطة دعوة مستخدم، محميّة. المستأجر والداعي من الرمز، لا من الجسم.
+// المدعوّ يُنشأ معلّقاً، ويصله رابط تفعيل يضع به كلمة مروره.
 internal static class InviteUserEndpoint
 {
     public static void MapInviteUserEndpoint(this IEndpointRouteBuilder app)
@@ -19,12 +18,10 @@ internal static class InviteUserEndpoint
             .WithTags("Users");
     }
 
-    // Role is an enum: the frontend sends it as an integer, and the
-    // model binder maps it to UserRole. The body carries no tenant.
+    // جسم الطلب: بلا كلمة مرور، فالمدعوّ يضعها لاحقاً
     public sealed record InviteUserRequest(
         string Email,
         string FullName,
-        string InitialPassword,
         UserRole Role);
 
     private static async Task<IResult> HandleAsync(
@@ -35,15 +32,20 @@ internal static class InviteUserEndpoint
         var command = new InviteUserCommand(
             request.Email,
             request.FullName,
-            request.InitialPassword,
             request.Role);
 
         var result = await sender.Send(command, cancellationToken);
 
-        // On success the handler returns the new user's id. Use 201 Created
-        // to signal a new resource was created.
+        // عند النجاح، نرجع رابط التفعيل ليأخذه المطوّر ويجرّبه
+        // في الإنتاج، يُرسَل الرابط بريداً بدل عرضه
         return result.IsFailed
             ? result.ToProblem()
-            : Results.Created($"/api/users/{result.Value}", new { id = result.Value });
+            : Results.Created(
+                $"/api/users/{result.Value.UserId}",
+                new
+                {
+                    id = result.Value.UserId,
+                    activationLink = result.Value.ActivationLink
+                });
     }
 }
