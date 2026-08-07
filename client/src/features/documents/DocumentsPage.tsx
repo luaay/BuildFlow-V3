@@ -6,7 +6,7 @@ import { useState } from "react";
 import { AppLayout } from "../../shared/components/AppLayout";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../auth/useAuth";
+
 import { Modal } from "../../shared/components/Modal";
 import { getDocuments, submitForReview, approveDocument, rejectDocument, createDocument } from "./document.api";
 import { getProjects } from "../projects/project.api";
@@ -36,7 +36,7 @@ export function DocumentsPage() {
     });
 
     const queryClient = useQueryClient();
-  const { user } = useAuth();
+  
 
   // ── عمليات سير المراجعة ──
   // نعرّف الثلاث معاً، كلٌّ يبطِل القائمة بعd نجاحه
