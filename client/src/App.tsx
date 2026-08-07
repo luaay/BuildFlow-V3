@@ -11,6 +11,7 @@ import { RegisterPage } from "./features/auth/RegisterPage";
 import { UsersPage } from "./features/users/UsersPage";
 import { DocumentsPage } from "./features/documents/DocumentsPage";
 import { AuditLogPage } from "./features/audit/AuditLogPage";
+import { ActivatePage } from "./features/auth/ActivatePage";
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
 
       {/* مسار الدخول: مفتوح، بلا حماية */}
       <Route path="/login" element={<LoginPage />} />
+
+      <Route path="/activate" element={<ActivatePage />} />
 
       {/* لوحة المعلومات: محميّة */}
       <Route

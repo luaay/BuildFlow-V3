@@ -40,3 +40,15 @@ export interface InviteUserRequest {
 export async function inviteUser(data: InviteUserRequest): Promise<void> {
   await apiClient.post("/api/users/invite", data);
 }
+
+// تفعيل الحساب: يرسل الرمز وكلمة المرور الجديدة
+// لا رمز مصادقة، فالمدعوّ لا يملك جلسة بعد
+export async function activateUser(
+  activationToken: string,
+  newPassword: string
+): Promise<void> {
+  await apiClient.post("/api/users/activate", {
+    activationToken,
+    newPassword,
+  });
+}
