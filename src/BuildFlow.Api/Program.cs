@@ -76,7 +76,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")  // أصل الواجهة في التطوير
+       policy.WithOrigins(
+                  "http://localhost:5173",
+                  "https://build-flow-v3-orpin.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
