@@ -1,11 +1,11 @@
-// صفحة المستخدمين: بطاقات الأعضاء بدوائرهم وشاراتهم
-// نبدأ بالعرض، ثم نضيف نافذة الدعوة
+// صفحة المستخدمين: بطاقات الأعضاء، ونافذة دعوة تعرض رابط التفعيل
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AppLayout } from "../../shared/components/AppLayout";
 import { Modal } from "../../shared/components/Modal";
 import { getUsers, inviteUser } from "./user.api";
+import type { InviteUserResult } from "./user.api";
 
 export function UsersPage() {
   const { data, isLoading, isError } = useQuery({
@@ -14,7 +14,6 @@ export function UsersPage() {
   });
 
   const users = data?.items ?? [];
-
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   return (
@@ -30,7 +29,6 @@ export function UsersPage() {
           </p>
         </div>
 
-        {/* زرّ الدعوة، بنفسجيّ، سنربطه بالنافذة لاحقاً */}
         <button
           onClick={() => setIsInviteOpen(true)}
           className="bg-[var(--color-purple)] hover:bg-[var(--color-purple-hover)] text-white text-sm font-medium px-4 py-2.5 rounded-xl transition"
@@ -54,7 +52,6 @@ export function UsersPage() {
               className="bg-[var(--color-bg-surface)] border border-[var(--color-border-subtle)] rounded-2xl p-5"
             >
               <div className="flex items-center gap-3 mb-3">
-                {/* دائرة بحرف الاسم الأوّل */}
                 <div className="w-12 h-12 rounded-full bg-[var(--color-purple)] flex items-center justify-center text-white font-semibold">
                   {user.fullName.charAt(0).toUpperCase()}
                 </div>
@@ -68,7 +65,6 @@ export function UsersPage() {
                 </div>
               </div>
 
-              {/* الشارات: الدور والحالة */}
               <div className="flex items-center gap-2">
                 <RoleBadge role={user.role} />
                 <span className="text-xs text-[var(--color-text-secondary)]">
@@ -79,7 +75,8 @@ export function UsersPage() {
           ))}
         </div>
       )}
-      {/* نافذة دعوة مستخدم */}
+
+      {/* نافذة الدعوة */}
       <InviteMemberModal
         isOpen={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
@@ -88,7 +85,7 @@ export function UsersPage() {
   );
 }
 
-// ── شارة الدور، ملوّنة حسب الدور ──
+// ── شارة الدور ──
 function RoleBadge({ role }: { role: string }) {
   const colorMap: Record<string, string> = {
     Owner: "bg-purple-500/20 text-purple-400",
@@ -106,6 +103,7 @@ function RoleBadge({ role }: { role: string }) {
 }
 
 // ── نافذة دعوة مستخدم جديد ──
+// بعد النجاح، تعرض رابط التفعيل وزرّ نسخ، بدل الإغلاق مباشرةً
 function InviteMemberModal({
   isOpen,
   onClose,
@@ -115,127 +113,170 @@ function InviteMemberModal({
 }) {
   const queryClient = useQueryClient();
 
-  // حقول النموذج، اسمان منفصلان كالتصميم
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("4"); // Member افتراضياً
-  const [password, setPassword] = useState("");
+
+  // نتيجة الدعوة، فيها الرابط؛ تظهر شاشة النجاح حين تُملأ
+  const [result, setResult] = useState<InviteUserResult | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const mutation = useMutation({
     mutationFn: inviteUser,
-    onSuccess: () => {
-      // أبطِل قائمة المستخدمين، فيظهر الجديد
+    onSuccess: (data) => {
+      // أبطِل القائمة، واعرض شاشة النجاح بالرابط
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      onClose();
-      resetForm();
+      setResult(data);
     },
   });
 
-  const resetForm = () => {
+  const resetAndClose = () => {
     setFirstName("");
     setLastName("");
     setEmail("");
     setRole("4");
-    setPassword("");
+    setResult(null);
+    setCopied(false);
+    onClose();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate({
       email,
-      // ندمج الاسمين في اسم كامل، كما يتوقّع الخادم
       fullName: `${firstName} ${lastName}`.trim(),
-      initialPassword: password,
       role: Number(role),
     });
   };
 
+  // نسخ الرابط إلى الحافظة
+  const copyLink = async () => {
+    if (!result) return;
+    await navigator.clipboard.writeText(result.activationLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Invite Member">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* الاسمان جنباً إلى جنب */}
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="First Name">
+    <Modal isOpen={isOpen} onClose={resetAndClose} title="Invite Member">
+      {/* شاشة النجاح: تظهر بعد الدعوة، فيها الرابط */}
+      {result ? (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-[var(--color-accent)]">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            <p className="font-medium">Invitation created</p>
+          </div>
+
+          <p className="text-sm text-[var(--color-text-secondary)]">
+            Share this activation link with the invited member. They'll use it
+            to set their own password.
+          </p>
+
+          {/* الرابط، مع زرّ النسخ */}
+          <div className="flex items-center gap-2">
             <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              readOnly
+              value={result.activationLink}
+              className="flex-1 bg-[var(--color-bg-base)] border border-[var(--color-border-subtle)] rounded-xl px-3 py-2.5 text-xs text-[var(--color-text-primary)] font-mono"
+            />
+            <button
+              onClick={copyLink}
+              className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-medium px-4 py-2.5 rounded-xl transition whitespace-nowrap"
+            >
+              {copied ? "Copied!" : "Copy"}
+            </button>
+          </div>
+
+          {/* ملاحظة تعليمية: في الإنتاج يُرسَل بريداً */}
+          <p className="text-xs text-[var(--color-text-secondary)] bg-[var(--color-bg-base)] rounded-lg p-3">
+            In a production system, this link would be emailed to the invited
+            member directly. It's shown here for demonstration.
+          </p>
+
+          <div className="flex justify-end pt-2">
+            <button
+              onClick={resetAndClose}
+              className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-medium px-5 py-2 rounded-xl transition"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      ) : (
+        // نموذج الدعوة
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="First Name">
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+            <Field label="Last Name">
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+          </div>
+
+          <Field label="Email" required>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="nour@company.com"
               className={inputClass}
             />
           </Field>
-          <Field label="Last Name">
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+
+          <Field label="Role">
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
               className={inputClass}
-            />
+            >
+              <option value="2">Admin</option>
+              <option value="3">Manager</option>
+              <option value="4">Member</option>
+              <option value="5">Viewer</option>
+            </select>
           </Field>
-        </div>
 
-        {/* البريد */}
-        <Field label="Email" required>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="nour@company.com"
-            className={inputClass}
-          />
-        </Field>
+          {mutation.isError && (
+            <p className="text-red-400 text-sm">Failed to invite member.</p>
+          )}
 
-        {/* الدور، أدوار المستأجر */}
-        <Field label="Role">
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className={inputClass}
-          >
-            <option value="2">Admin</option>
-            <option value="3">Manager</option>
-            <option value="4">Member</option>
-            <option value="5">Viewer</option>
-          </select>
-        </Field>
-
-        {/* كلمة المرور المؤقّتة */}
-        <Field label="Temporary Password" required>
-          <input
-            type="text"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-
-        {mutation.isError && (
-          <p className="text-red-400 text-sm">Failed to invite member.</p>
-        )}
-
-        {/* الأزرhd */}
-        <div className="flex items-center justify-end gap-3 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] px-4 py-2 transition"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={mutation.isPending}
-            className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-medium px-5 py-2 rounded-xl transition disabled:opacity-50"
-          >
-            {mutation.isPending ? "Sending..." : "Send Invite"}
-          </button>
-        </div>
-      </form>
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={resetAndClose}
+              className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] px-4 py-2 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={mutation.isPending}
+              className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white text-sm font-medium px-5 py-2 rounded-xl transition disabled:opacity-50"
+            >
+              {mutation.isPending ? "Sending..." : "Send Invite"}
+            </button>
+          </div>
+        </form>
+      )}
     </Modal>
   );
 }
 
-// ── مكوّن حقل، وصنف الحقول ──
+// ── مكوّن حقل ──
 function Field({
   label,
   required,

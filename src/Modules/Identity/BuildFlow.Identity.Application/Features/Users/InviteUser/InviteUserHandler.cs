@@ -5,13 +5,15 @@ using BuildFlow.Identity.Domain.Tenants;
 using BuildFlow.Identity.Domain.Users;
 using BuildFlow.Identity.Domain.Users.Enums;
 using FluentResults;
+using Microsoft.Extensions.Configuration;
 
 namespace BuildFlow.Identity.Application.Features.Users.InviteUser;
 
 internal sealed class InviteUserHandler(
     ICurrentUserService currentUser,
     IUserRepository userRepository,    
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    IConfiguration configuration)
    : ICommandHandler<InviteUserCommand, InviteUserResult>
 {
     public async Task<Result<InviteUserResult>> Handle(
@@ -54,9 +56,12 @@ internal sealed class InviteUserHandler(
     await unitOfWork.SaveChangesAsync(cancellationToken);
 
     // 6. ابنِ الرابط؛ في الإنتاج يُرسَل بريداً، هنا نُظهره
+    // عنوان الواجهة من الإعداد، فيصحّ في كل بيئة
+    var frontendBaseUrl = configuration["Frontend:BaseUrl"]
+        ?? "http://localhost:5173";
     var activationLink =
-        $"http://localhost:5173/activate?token={activationToken}";
-
+        $"{frontendBaseUrl}/activate?token={activationToken}";
+        
     return Result.Ok(new InviteUserResult(
         user.Id.Value, activationToken, activationLink));
 }

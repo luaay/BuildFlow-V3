@@ -28,17 +28,28 @@ export async function getUsers(): Promise<PagedResult<User>> {
 }
 
 
-// ما نرسله لدعوة مستخdم، يطابق أمر الخادم
+// ما نرسله لدعوة مستخدم، يطابق أمر الخادم الجديد، بلا كلمة مرور
 export interface InviteUserRequest {
   email: string;
   fullName: string;
-  initialPassword: string;
   role: number;
 }
 
-// دالّة دعوة مستخدم جديد للمستأجر
-export async function inviteUser(data: InviteUserRequest): Promise<void> {
-  await apiClient.post("/api/users/invite", data);
+// نتيجة الدعوة: المعرّف ورابط التفعيل
+export interface InviteUserResult {
+  id: string;
+  activationLink: string;
+}
+
+// دالّة دعوة مستخدم: ترجع رابط التفعيل
+export async function inviteUser(
+  data: InviteUserRequest
+): Promise<InviteUserResult> {
+  const response = await apiClient.post<InviteUserResult>(
+    "/api/users/invite",
+    data
+  );
+  return response.data;
 }
 
 // تفعيل الحساب: يرسل الرمز وكلمة المرور الجديدة
