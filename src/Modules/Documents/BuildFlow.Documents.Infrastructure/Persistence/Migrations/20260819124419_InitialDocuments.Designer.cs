@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildFlow.Documents.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(DocumentsDbContext))]
-    [Migration("20260719221541_InitialDocuments")]
+    [Migration("20260819124419_InitialDocuments")]
     partial class InitialDocuments
     {
         /// <inheritdoc />

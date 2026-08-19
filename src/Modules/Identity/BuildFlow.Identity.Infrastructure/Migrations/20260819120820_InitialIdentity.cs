@@ -47,6 +47,8 @@ namespace BuildFlow.Identity.Infrastructure.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "int", nullable: false),
                     LockoutEndUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ActivationToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ActivationTokenExpiresUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ModifiedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),

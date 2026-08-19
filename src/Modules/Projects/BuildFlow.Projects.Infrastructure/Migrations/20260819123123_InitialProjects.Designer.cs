@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuildFlow.Projects.Infrastructure.Migrations
 {
     [DbContext(typeof(ProjectsDbContext))]
-    [Migration("20260708162048_InitialProjectsSchema")]
-    partial class InitialProjectsSchema
+    [Migration("20260819123123_InitialProjects")]
+    partial class InitialProjects
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

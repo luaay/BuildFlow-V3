@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BuildFlow.Projects.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialProjectsSchema : Migration
+    public partial class InitialProjects : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
