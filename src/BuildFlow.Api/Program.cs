@@ -24,6 +24,8 @@ using ProjectsCurrentUser = BuildFlow.Projects.Application.Abstractions.ICurrent
 using BuildFlow.Documents.Application;
 using BuildFlow.Documents.Infrastructure;
 using BuildFlow.SharedInfrastructure.Auditing;
+using BuildFlow.Api.Observability;
+using Serilog.Sinks.OpenTelemetry;
 
 // Bootstrap logger: a temporary logger so that even failures during
 // host startup get logged before the full configuration is read.
@@ -39,10 +41,27 @@ try
 
     // Replace the default logging with Serilog, reading the detailed
     // configuration (levels, sinks) from appsettings at runtime.
-    builder.Host.UseSerilog((context, services, configuration) =>
+       builder.Host.UseSerilog((context, services, configuration) =>
+    {
         configuration
             .ReadFrom.Configuration(context.Configuration)
-            .ReadFrom.Services(services));
+            .ReadFrom.Services(services);
+
+        var otlpEndpoint = context.Configuration["Otel:Endpoint"];
+
+        if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+        {
+            configuration.WriteTo.OpenTelemetry(options =>
+            {
+                options.Endpoint = otlpEndpoint;
+                options.Protocol = OtlpProtocol.Grpc;
+                options.ResourceAttributes = new Dictionary<string, object>
+                {
+                    ["service.name"] = "BuildFlow.Api"
+                };
+            });
+        }
+    });
 
     // --- Service registration (the Composition Root) ---
     builder.Services.AddIdentityApplication();
@@ -67,6 +86,10 @@ try
     builder.Services.AddScoped<IdentityCurrentUser, CurrentUserService>();
     builder.Services.AddScoped<ProjectsCurrentUser, ProjectsCurrentUserService>();
     builder.Services.AddScoped<DocumentsCurrentUser, DocumentsCurrentUserService>();
+
+
+
+    builder.Services.AddObservability(builder.Configuration);
 
     // JWT authentication + authorization, bound to the same Jwt options.
     builder.Services.AddJwtAuthentication(builder.Configuration);
