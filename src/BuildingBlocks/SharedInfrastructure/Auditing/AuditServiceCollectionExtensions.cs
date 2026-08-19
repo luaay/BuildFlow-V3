@@ -14,9 +14,14 @@ public static class AuditServiceCollectionExtensions
         IConfiguration configuration)
     {
         // سياق التدقيق DbContext، على سلسلة اتصال التدقيق
+        // سياق التدقيق، على سلسلة التدقيق إن وُجدت، وإلا على سلسلة مشتركة
+        // على الاستضافة، AuditDb قد تغيب، فنتراجع إلى IdentityDb الموجودة
+        var auditConnection =
+            configuration.GetConnectionString("AuditDb")
+            ?? configuration.GetConnectionString("IdentityDb");
+
         services.AddDbContext<AuditDbContext>(options =>
-            options.UseSqlServer(
-                configuration.GetConnectionString("AuditDb")));
+            options.UseSqlServer(auditConnection));
 
         // تنفيذ المستودع Repository
         services.AddScoped<IAuditRepository, AuditRepository>();
