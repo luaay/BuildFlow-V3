@@ -86,48 +86,23 @@ builder.Services.AddCors(options =>
 
     var app = builder.Build();
 
-// إنشاء مخطّط قاعدة البيانات عند الإقلاع
-// إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن لم يكن موجوداً
-// إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن لم يكن موجوداً
-// إنشاء مخطّط قاعدة البيانات عند الإقلاع، إن كانت فارغة
-using (var scope = app.Services.CreateScope())
-{
-    var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-    var projectsDb = scope.ServiceProvider.GetRequiredService<ProjectsDbContext>();
-    var documentsDb = scope.ServiceProvider.GetRequiredService<DocumentsDbContext>();
-    var auditDb = scope.ServiceProvider.GetRequiredService<AuditDbContext>();
-
-    var identityCreator = identityDb.GetService<IRelationalDatabaseCreator>();
-    var projectsCreator = projectsDb.GetService<IRelationalDatabaseCreator>();
-    var documentsCreator = documentsDb.GetService<IRelationalDatabaseCreator>();
-    var auditCreator = auditDb.GetService<IRelationalDatabaseCreator>();
-
-    // أنشئ القاعدة إن لم تكن موجودة أصلاً
-    if (!await identityCreator.ExistsAsync())
+    // تطبيق الهجرات عند الإقلاع، فينشئ الجداول ويعدّلها حسب الهجرات غير المطبّقة
+    using (var scope = app.Services.CreateScope())
     {
-        await identityCreator.CreateAsync();
+        var identityDb = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+        var projectsDb = scope.ServiceProvider.GetRequiredService<ProjectsDbContext>();
+        var documentsDb = scope.ServiceProvider.GetRequiredService<DocumentsDbContext>();
+        var auditDb = scope.ServiceProvider.GetRequiredService<AuditDbContext>();
+
+        // كل سياق يطبّق هجراته، فالهجرات تنشئ الجداول وتعدّلها معاً
+        await identityDb.Database.MigrateAsync();
+        await projectsDb.Database.MigrateAsync();
+        await documentsDb.Database.MigrateAsync();
+        await auditDb.Database.MigrateAsync();
+
+        Log.Information("Database migrations applied");
     }
 
-    // أنشئ الجداول إن كانت القاعدة فارغة
-    if (!await identityCreator.HasTablesAsync())
-    {
-        await identityCreator.CreateTablesAsync();
-        await projectsCreator.CreateTablesAsync();
-        await documentsCreator.CreateTablesAsync();
-    }
-
-    // جدول التدقيق: فحص مستقلّ، فقد أُضيف بعد إنشاء بقيّة الجداول
-    // نحاول إنشاءه، ونتجاهل الخطأ إن كان موجوداً أصلاً
-    try
-    {
-        await auditCreator.CreateTablesAsync();
-        Log.Information("Audit table created");
-    }
-    catch
-    {
-        // الجدول موجود أصلاً، لا حاجة لفعل شيء
-    }
-}
     // --- HTTP pipeline ---
     //if (app.Environment.IsDevelopment())
     //{
@@ -135,8 +110,8 @@ using (var scope = app.Services.CreateScope())
     //    app.UseSwaggerUI();
     //}
 
-        // التوثيق مفعّل في كل البيئات، فهذا مشروع محفظة يُجرَّب حيّاً
-        app.UseSwagger();
+    // التوثيق مفعّل في كل البيئات، فهذا مشروع محفظة يُجرَّب حيّاً
+    app.UseSwagger();
         app.UseSwaggerUI();
 
     app.UseHttpsRedirection();
