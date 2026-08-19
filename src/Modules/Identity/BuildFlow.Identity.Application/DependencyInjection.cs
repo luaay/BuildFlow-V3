@@ -18,6 +18,7 @@ public static class DependencyInjection
             config.RegisterServicesFromAssembly(assembly);
 
             // سجّل سلوك التحقّق في الأنبوب Pipeline
+            config.AddOpenBehavior(typeof(TracingBehavior<,>));
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
             config.AddOpenBehavior(typeof(PerformanceBehavior<,>));

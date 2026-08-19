@@ -18,6 +18,7 @@ public static class DependencyInjection
             config.RegisterServicesFromAssembly(assembly);
 
             // الترتيب مهمّ: التسجيل أوّلاً ليرى كل الطلبات
+            config.AddOpenBehavior(typeof(TracingBehavior<,>));
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
             config.AddOpenBehavior(typeof(PerformanceBehavior<,>));

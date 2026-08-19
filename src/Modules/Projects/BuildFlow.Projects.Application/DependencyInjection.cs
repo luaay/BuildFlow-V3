@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using BuildFlow.Application.Abstractions.Behaviors;
 
+
 namespace BuildFlow.Projects.Application;
 
 // نقطة تسجيل خدمات طبقة تطبيق المشاريع
@@ -19,6 +20,7 @@ public static class DependencyInjection
 
             // سجّل سلوك التحقّق في الأنبوب Pipeline
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(TracingBehavior<,>));
         });
 
         // تسجيل كل المتحقّقات في هذه التجميعة تلقائياً
