@@ -1,4 +1,5 @@
 ﻿using BuildFlow.Application.Abstractions;
+using BuildFlow.Application.Abstractions.Caching;
 using BuildFlow.Identity.Application.Abstractions;
 using BuildFlow.Identity.Domain.Errors;
 using BuildFlow.Identity.Domain.Tenants;
@@ -11,7 +12,8 @@ namespace BuildFlow.Identity.Application.Features.Users.InviteUser;
 internal sealed class InviteUserHandler(
     ICurrentUserService currentUser,
     IUserRepository userRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    ICacheService cache)
     : ICommandHandler<InviteUserCommand, InviteUserResult>
 {
     // عنوان الواجهة المنشورة، لبناء رابط التفعيل
@@ -57,7 +59,11 @@ internal sealed class InviteUserHandler(
         await userRepository.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // 6. ابنِ رابط التفعيل بعنوان الواجهة المنشورة
+        // 6. العضو الجديد يُبطل كل صفحات قائمة المستخدمين لهذا المستأجر
+        await cache.RemoveByPrefixAsync(
+            UserCacheKeys.TenantPrefix(tenantId.Value), cancellationToken);
+
+        // 7. ابنِ رابط التفعيل بعنوان الواجهة المنشورة
         var activationLink =
             $"{FrontendBaseUrl}/activate?token={activationToken}";
 
