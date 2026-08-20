@@ -26,6 +26,7 @@ using BuildFlow.Documents.Infrastructure;
 using BuildFlow.SharedInfrastructure.Auditing;
 using BuildFlow.Api.Observability;
 using Serilog.Sinks.OpenTelemetry;
+using BuildFlow.SharedInfrastructure.Caching;
 
 // Bootstrap logger: a temporary logger so that even failures during
 // host startup get logged before the full configuration is read.
@@ -62,6 +63,8 @@ try
             });
         }
     });
+
+    builder.Services.AddCaching(builder.Configuration);
 
     // --- Service registration (the Composition Root) ---
     builder.Services.AddIdentityApplication();
