@@ -6,6 +6,8 @@ using BuildFlow.Identity.Domain.Tenants;
 using BuildFlow.Identity.Domain.Users;
 using BuildFlow.Identity.Domain.Users.Enums;
 using FluentResults;
+using BuildFlow.Application.Abstractions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BuildFlow.Identity.Application.Features.Users.InviteUser;
 
@@ -13,13 +15,11 @@ internal sealed class InviteUserHandler(
     ICurrentUserService currentUser,
     IUserRepository userRepository,
     IUnitOfWork unitOfWork,
-    ICacheService cache)
+    ICacheService cache,
+    IOptions<FrontendOptions> frontendOptions)
     : ICommandHandler<InviteUserCommand, InviteUserResult>
 {
-    // عنوان الواجهة المنشورة، لبناء رابط التفعيل
-    private const string FrontendBaseUrl =
-        "https://build-flow-v3-orpin.vercel.app";
-
+    
     public async Task<Result<InviteUserResult>> Handle(
         InviteUserCommand command,
         CancellationToken cancellationToken)
@@ -63,9 +63,10 @@ internal sealed class InviteUserHandler(
         await cache.RemoveByPrefixAsync(
             UserCacheKeys.TenantPrefix(tenantId.Value), cancellationToken);
 
-        // 7. ابنِ رابط التفعيل بعنوان الواجهة المنشورة
+       
+        // 7. ابنِ رابط التفعيل من الإعدادات
         var activationLink =
-            $"{FrontendBaseUrl}/activate?token={activationToken}";
+            $"{frontendOptions.Value.BaseUrl}/activate?token={activationToken}";
 
         return Result.Ok(new InviteUserResult(
             user.Id.Value, activationToken, activationLink));

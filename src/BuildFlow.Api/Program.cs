@@ -27,6 +27,7 @@ using BuildFlow.SharedInfrastructure.Auditing;
 using BuildFlow.Api.Observability;
 using Serilog.Sinks.OpenTelemetry;
 using BuildFlow.SharedInfrastructure.Caching;
+using BuildFlow.Application.Abstractions.Configuration;
 
 // Bootstrap logger: a temporary logger so that even failures during
 // host startup get logged before the full configuration is read.
@@ -96,6 +97,9 @@ try
 
     // JWT authentication + authorization, bound to the same Jwt options.
     builder.Services.AddJwtAuthentication(builder.Configuration);
+
+    builder.Services.Configure<FrontendOptions>(
+    builder.Configuration.GetSection(FrontendOptions.SectionName));
 
     // سياسة السماح للواجهة الأمامية بالاتصال
 builder.Services.AddCors(options =>
