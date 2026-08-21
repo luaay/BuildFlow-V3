@@ -1,9 +1,11 @@
 using System.Text.Json;
 using BuildFlow.Application.Abstractions.Caching;
+using Serilog;
 using StackExchange.Redis;
 
 namespace BuildFlow.SharedInfrastructure.Caching;
 
+// المخزن تحسين لا اعتماد: أي إخفاق فيه يعود بالطلب إلى المصدر الأصلي
 public sealed class RedisCacheService(IConnectionMultiplexer connection) : ICacheService
 {
     private static readonly TimeSpan DefaultExpiration = TimeSpan.FromMinutes(5);
@@ -14,11 +16,20 @@ public sealed class RedisCacheService(IConnectionMultiplexer connection) : ICach
         string key,
         CancellationToken cancellationToken = default)
     {
-        var value = await _database.StringGetAsync(key);
+        try
+        {
+            var value = await _database.StringGetAsync(key);
 
-        return value.IsNullOrEmpty
-            ? default
-            : JsonSerializer.Deserialize<T>(value!);
+            return value.IsNullOrEmpty
+                ? default
+                : JsonSerializer.Deserialize<T>(value!);
+        }
+        catch (Exception exception)
+        {
+            // إخفاق القراءة يُعامَل كإخفاق إصابة — يُقرأ من المصدر
+            Log.Warning(exception, "Cache read failed for {CacheKey}", key);
+            return default;
+        }
     }
 
     public async Task SetAsync<T>(
@@ -27,30 +38,53 @@ public sealed class RedisCacheService(IConnectionMultiplexer connection) : ICach
         TimeSpan? expiration = null,
         CancellationToken cancellationToken = default)
     {
-        var payload = JsonSerializer.Serialize(value);
+        try
+        {
+            var payload = JsonSerializer.Serialize(value);
 
-        await _database.StringSetAsync(
-            key,
-            payload,
-            expiration ?? DefaultExpiration);
+            await _database.StringSetAsync(
+                key,
+                payload,
+                expiration ?? DefaultExpiration);
+        }
+        catch (Exception exception)
+        {
+            Log.Warning(exception, "Cache write failed for {CacheKey}", key);
+        }
     }
 
-    public Task RemoveAsync(string key, CancellationToken cancellationToken = default)
-        => _database.KeyDeleteAsync(key);
+    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _database.KeyDeleteAsync(key);
+        }
+        catch (Exception exception)
+        {
+            Log.Warning(exception, "Cache removal failed for {CacheKey}", key);
+        }
+    }
 
     public async Task RemoveByPrefixAsync(
         string prefix,
         CancellationToken cancellationToken = default)
     {
-        foreach (var endpoint in connection.GetEndPoints())
+        try
         {
-            var server = connection.GetServer(endpoint);
-
-            await foreach (var key in server.KeysAsync(pattern: $"{prefix}*")
-                               .WithCancellation(cancellationToken))
+            foreach (var endpoint in connection.GetEndPoints())
             {
-                await _database.KeyDeleteAsync(key);
+                var server = connection.GetServer(endpoint);
+
+                await foreach (var key in server.KeysAsync(pattern: $"{prefix}*")
+                                   .WithCancellation(cancellationToken))
+                {
+                    await _database.KeyDeleteAsync(key);
+                }
             }
+        }
+        catch (Exception exception)
+        {
+            Log.Warning(exception, "Cache invalidation failed for {CachePrefix}", prefix);
         }
     }
 }
