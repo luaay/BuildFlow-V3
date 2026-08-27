@@ -12,9 +12,11 @@ import { UsersPage } from "./features/users/UsersPage";
 import { DocumentsPage } from "./features/documents/DocumentsPage";
 import { AuditLogPage } from "./features/audit/AuditLogPage";
 import { ActivatePage } from "./features/auth/ActivatePage";
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
+    <>
     <Routes>
 
       {/* مسار التسجيل: مفتوح */}
@@ -86,6 +88,8 @@ function App() {
       {/* المسار الجذر: حوّل إلى المشاريع */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+    <Analytics />
+    </>
   );
 }
 
