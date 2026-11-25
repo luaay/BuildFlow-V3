@@ -53,7 +53,11 @@ internal static class AuthenticationExtensions
                 };
             });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("OwnerOrAdmin", policy =>
+                policy.RequireRole("Owner", "Admin"));
+        });
 
         return services;
     }

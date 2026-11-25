@@ -13,7 +13,7 @@ internal static class InviteUserEndpoint
     public static void MapInviteUserEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/users/invite", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("OwnerOrAdmin")
             .WithName("InviteUser")
             .WithTags("Users");
     }

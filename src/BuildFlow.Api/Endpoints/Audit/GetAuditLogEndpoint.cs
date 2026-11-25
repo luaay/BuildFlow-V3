@@ -11,7 +11,7 @@ internal static class GetAuditLogEndpoint
     public static void MapGetAuditLogEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapGet("/api/audit", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("OwnerOrAdmin")
             .WithName("GetAuditLog")
             .WithTags("Audit");
     }
