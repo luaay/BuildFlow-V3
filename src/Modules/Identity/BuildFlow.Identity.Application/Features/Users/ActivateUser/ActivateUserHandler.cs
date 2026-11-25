@@ -18,9 +18,12 @@ internal sealed class ActivateUserHandler(
         ActivateUserCommand command,
         CancellationToken cancellationToken)
     {
-        // 1. جد المستخدم برمز التفعيل
+        
+       // 1. Hash the incoming token, then find the user by that hash
+        var tokenHash = ActivationTokenHasher.Hash(command.ActivationToken);
+
         var user = await userRepository.GetByActivationTokenAsync(
-            command.ActivationToken, cancellationToken);
+            tokenHash, cancellationToken);
 
         if (user is null)
             return Result.Fail(IdentityErrors.User.InvalidActivationToken);
@@ -30,8 +33,8 @@ internal sealed class ActivateUserHandler(
 
         // 3. فعّل الحساب: يضع كلمة المرور، ويصير نشطاً
         // الكيان يتحقّق: معلّق، ورمز صحيح، وغير منتهٍ
-        var activationResult = user.ActivateWithPassword(
-            command.ActivationToken, passwordHash);
+       var activationResult = user.ActivateWithPassword(
+            tokenHash, passwordHash);
 
         if (activationResult.IsFailed)
             return Result.Fail(activationResult.Errors);

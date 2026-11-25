@@ -46,12 +46,13 @@ internal sealed class InviteUserHandler(
             System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
 
         // 4. أنشئ مستخدماً معلّقاً، بلا كلمة مرور، برمز التفعيل
-        var user = User.CreateInvited(
+        
+       var user = User.CreateInvited(
             tenantId,
             email,
             command.FullName,
             command.Role,
-            activationToken);
+            ActivationTokenHasher.Hash(activationToken));
 
         user.CreatedBy = currentUser.UserId.Value;
 
