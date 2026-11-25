@@ -26,11 +26,16 @@ internal sealed class ChangeProjectStatusHandler(
         if (project is null)
             return Result.Fail(ProjectErrors.NotFound(projectId));
 
+        // Only a Lead may change the project status.
+        if (!project.IsLead(currentUser.UserId))
+            return Result.Fail(ProjectErrors.Forbidden);
+
+
         // Each lifecycle method returns a Result; no exceptions to catch.
         var transition = command.TargetStatus switch
         {
-            ProjectStatus.Active    => project.Activate(),
-            ProjectStatus.OnHold    => project.PutOnHold(),
+            ProjectStatus.Active => project.Activate(),
+            ProjectStatus.OnHold => project.PutOnHold(),
             ProjectStatus.Completed => project.Complete(),
             ProjectStatus.Cancelled => project.Cancel(),
             _ => Result.Fail(ProjectErrors.InvalidStatusTransition(
