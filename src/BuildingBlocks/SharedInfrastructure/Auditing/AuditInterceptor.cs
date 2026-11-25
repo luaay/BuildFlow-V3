@@ -23,7 +23,7 @@ public sealed class AuditInterceptor(IServiceProvider serviceProvider)
     // أعمدة حسّاسة نستثنيها من التدقيق excluded sensitive columns
     private static readonly HashSet<string> ExcludedColumns = new(StringComparer.OrdinalIgnoreCase)
     {
-        "PasswordHash", "RefreshToken", "SecurityStamp"
+        "PasswordHash", "RefreshToken", "SecurityStamp", "ActivationToken"
     };
 
     // نعترض لحظة الحفظ SavingChanges، قبل أن يُكتَب للقاعدة
