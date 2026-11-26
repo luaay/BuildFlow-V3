@@ -57,6 +57,9 @@ internal static class AuthenticationExtensions
         {
             options.AddPolicy("OwnerOrAdmin", policy =>
                 policy.RequireRole("Owner", "Admin"));
+
+            options.AddPolicy("CanWrite", policy =>
+                policy.RequireRole("Owner", "Admin", "Manager", "Member"));
         });
 
         return services;

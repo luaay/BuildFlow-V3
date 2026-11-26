@@ -9,7 +9,7 @@ internal static class UpdateProjectEndpoint
     public static void MapUpdateProjectEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPut("/api/projects/{projectId:guid}", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("UpdateProject")
             .WithTags("Projects");
     }

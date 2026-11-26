@@ -10,7 +10,7 @@ internal static class AddMemberEndpoint
     public static void MapAddMemberEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/projects/{projectId:guid}/members", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("AddMember")
             .WithTags("Projects");
     }

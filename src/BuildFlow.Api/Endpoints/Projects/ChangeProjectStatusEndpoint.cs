@@ -10,7 +10,7 @@ internal static class ChangeProjectStatusEndpoint
     public static void MapChangeProjectStatusEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPatch("/api/projects/{projectId:guid}/status", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("ChangeProjectStatus")
             .WithTags("Projects");
     }

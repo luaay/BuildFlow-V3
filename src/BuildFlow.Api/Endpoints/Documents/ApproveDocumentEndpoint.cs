@@ -9,7 +9,7 @@ internal static class ApproveDocumentEndpoint
     public static void MapApproveDocumentEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/documents/{documentId:guid}/approve", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("ApproveDocument")
             .WithTags("Documents");
     }

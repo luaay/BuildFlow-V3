@@ -10,7 +10,7 @@ internal static class CreateDocumentEndpoint
     public static void MapCreateDocumentEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/documents", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("CreateDocument")
             .WithTags("Documents");
     }

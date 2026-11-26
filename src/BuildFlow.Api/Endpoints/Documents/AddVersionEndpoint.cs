@@ -9,7 +9,7 @@ internal static class AddVersionEndpoint
     public static void MapAddVersionEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/documents/{documentId:guid}/versions", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("AddVersion")
             .WithTags("Documents");
     }

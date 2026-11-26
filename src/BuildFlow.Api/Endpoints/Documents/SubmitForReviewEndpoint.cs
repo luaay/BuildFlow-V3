@@ -9,7 +9,7 @@ internal static class SubmitForReviewEndpoint
     public static void MapSubmitForReviewEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/documents/{documentId:guid}/submit-for-review", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("SubmitForReview")
             .WithTags("Documents");
     }

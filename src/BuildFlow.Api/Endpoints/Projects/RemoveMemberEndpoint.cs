@@ -9,7 +9,7 @@ internal static class RemoveMemberEndpoint
     public static void MapRemoveMemberEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapDelete("/api/projects/{projectId:guid}/members/{userId:guid}", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("RemoveMember")
             .WithTags("Projects");
     }

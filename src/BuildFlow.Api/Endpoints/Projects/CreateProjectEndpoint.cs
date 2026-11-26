@@ -11,7 +11,7 @@ internal static class CreateProjectEndpoint
     public static void MapCreateProjectEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/projects", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("CreateProject")
             .WithTags("Projects");
     }

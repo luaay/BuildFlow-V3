@@ -9,7 +9,7 @@ internal static class RejectDocumentEndpoint
     public static void MapRejectDocumentEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapPost("/api/documents/{documentId:guid}/reject", HandleAsync)
-            .RequireAuthorization()
+            .RequireAuthorization("CanWrite")
             .WithName("RejectDocument")
             .WithTags("Documents");
     }
