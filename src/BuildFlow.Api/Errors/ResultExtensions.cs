@@ -53,8 +53,10 @@ internal static class ResultExtensions
                  or "User.AccountInactive")
             return (StatusCodes.Status401Unauthorized, "Unauthorized");
 
-        // Authorization / forbidden states.
-        if (code is "Tenant.Suspended" or "User.CannotInviteOwner")
+                // Authorization / forbidden states.
+        // Any code ending in "Forbidden" (Project.Forbidden, ...) maps to 403.
+        if (code.EndsWith("Forbidden")
+            || code is "Tenant.Suspended" or "User.CannotInviteOwner")
             return (StatusCodes.Status403Forbidden, "Forbidden");
 
         // Anything unmapped is a safe generic.
