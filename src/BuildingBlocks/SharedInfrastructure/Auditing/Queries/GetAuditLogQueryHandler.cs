@@ -41,14 +41,16 @@ public sealed class GetAuditLogQueryHandler(
             HasPreviousPage: request.Page > 1);
     }
 
-    // نستخرج المستأجر tenant من مطالبة الرمز، كما في الاعتراض
+        // نستخرج المستأجر tenant من مطالبة الرمز claim.
+    // إن غابت المطالبة نرفض الطلب، ولا نقرأ سجلات مستأجر فارغ.
     private Guid GetTenantId()
     {
         var tenantIdClaim = httpContextAccessor.HttpContext?.User
             .FindFirst("tenant")?.Value;
 
-        return Guid.TryParse(tenantIdClaim, out var tenantId)
-            ? tenantId
-            : Guid.Empty;
+        if (!Guid.TryParse(tenantIdClaim, out var tenantId) || tenantId == Guid.Empty)
+            throw new InvalidOperationException("Tenant claim is missing or invalid.");
+
+        return tenantId;
     }
 }
