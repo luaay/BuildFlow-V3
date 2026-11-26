@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.RateLimiting;
 using BuildFlow.Api.Errors;
 using BuildFlow.Identity.Application.Features.Users.ActivateUser;
 using MediatR;
@@ -11,7 +12,8 @@ internal static class ActivateUserEndpoint
 {
     public static void MapActivateUserEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/users/activate", HandleAsync)
+                app.MapPost("/api/users/activate", HandleAsync)
+            .RequireRateLimiting("activation")
             .WithName("ActivateUser")
             .WithTags("Users");
     }

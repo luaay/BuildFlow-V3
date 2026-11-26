@@ -1,3 +1,5 @@
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using BuildFlow.Identity.Application;
 using BuildFlow.Identity.Infrastructure;
 // using BuildFlow.Identity.Application.Abstractions;
@@ -114,6 +116,22 @@ builder.Services.AddCors(options =>
     });
 });
 
+    // Rate limiting for open endpoints, partitioned per client IP.
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+        options.AddPolicy("activation", httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
+                }));
+    });
+
     var app = builder.Build();
 
     // تطبيق الهجرات عند الإقلاع، فينشئ الجداول ويعدّلها حسب الهجرات غير المطبّقة
@@ -147,6 +165,8 @@ builder.Services.AddCors(options =>
     app.UseHttpsRedirection();
 
     app.UseCors("AllowFrontend");
+
+    app.UseRateLimiter();
 
     // المصادقة أولاً، فتُقرأ الهوية من الرمز
     app.UseAuthentication();
