@@ -22,7 +22,7 @@ public sealed class RedisCacheService(IConnectionMultiplexer connection) : ICach
 
             return value.IsNullOrEmpty
                 ? default
-                : JsonSerializer.Deserialize<T>(value!);
+                : JsonSerializer.Deserialize<T>(value.ToString());
         }
         catch (Exception exception)
         {

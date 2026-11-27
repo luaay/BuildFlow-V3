@@ -1,5 +1,5 @@
 # المرحلة الأولى: البناء
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # انسخ ملفّ الحلّ وملفّات المشاريع أولاً، لاستغلال طبقات التخزين المؤقّت
@@ -12,7 +12,7 @@ RUN dotnet publish "src/BuildFlow.Api/BuildFlow.Api.csproj" \
     -c Release -o /app/publish --no-restore
 
 # المرحلة الثانية: التشغيل، صورة خفيفة بلا أدوات بناء
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
